@@ -1,5 +1,5 @@
 (ns chart.core
-  (:require [reagent.core :as reagent :refer [atom :>]]
+  (:require [reagent.core :as reagent :refer [atom]]
             ["react-vis" :as rvis]))
 
 ;; define your app data so that it doesn't get over-written on reload
@@ -27,14 +27,14 @@
   [:div
    [line-chart chart-data]])
 
-#_(defn render-app []
+(defn render-app []
   (reagent/render [app-scaffold]
             (.getElementById js/document "app")))
 
 (defn hello-world []
   [:div
    [:h1 (:text @app-state)]
-   [:h3 "Edit this and watch it change!"]
+   [:h3 "Edit this and watch it change!!!"]
    [app-scaffold]])
 
 (defn start []
