@@ -1,4 +1,4 @@
-(ns chart.core
+(ns lexy.core
   (:require [reagent.core :as reagent :refer [atom]]
             [reagent.dom :as rdom]))
 

@@ -15,13 +15,13 @@
 
         :modules
         {:main
-         {:entries [chart.core]}}
+         {:entries [lexy.core]}}
 
         :devtools
         ;; before live-reloading any code call this function
-        {:before-load chart.core/stop
+        {:before-load lexy.core/stop
          ;; after live-reloading finishes call this function
-         :after-load chart.core/start
+         :after-load lexy.core/start
          ;; serve the public directory over http at port 8700
          :http-root    "public"
          :http-port    8700
