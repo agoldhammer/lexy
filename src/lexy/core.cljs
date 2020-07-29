@@ -10,6 +10,8 @@
   [:div
    [:h1 (:text @app-state)]
    [:h3 "Edit this and watch it change!!!"]
+   [:div.app-cntnr
+    [:p "hello"]]
    #_[app-scaffold]])
 
 (defn start []
