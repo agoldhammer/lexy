@@ -8,7 +8,7 @@
 
 (defn hello-world []
   [:section.section
-   [:div.level 
+   [:div.level
     [:button.button.is-rounded.level-item.mr-1 (:text @app-state)]
     [:button.button.level-item.ml-1 "Edit this and watch it change!!!"]]
    [:div.container
@@ -20,10 +20,13 @@
   [:nav.navbar.is-primary
    {:role "navigation" :aria-label "main navigation"}
    [:div.navbar-brand
-    [:a.navbar-item {:href "#"} "lexy"]
+    [:div.level
+     [:i.fas.fa-bookmark.ml-2.mt-5]
+     [:a.navbar-item.mt-5.has-text-danger.is-size-4.is-italic
+      {:href "#"} "lexy"]]
     [:a.navbar-burger.burger {:role "button"
-                       :aria-label "menu"
-                       :aria-expanded "false"}
+                              :aria-label "menu"
+                              :aria-expanded "false"}
      [:span {:aria-hidden "true"}]
      [:span {:aria-hidden "true"}]
      [:span {:aria-hidden "true"}]]]
@@ -33,7 +36,7 @@
      [:a.navbar-item {:href "#"} "Italian"]]]])
 
 (defn file-picker []
-  [:table-container 
+  [:table-container
    [:div.content
     [:table.table.is-bordered.is-hoverable
      [:thead
@@ -46,10 +49,10 @@
 
 (defn start []
   (rdom/render [:div
-                [menu ]
+                [menu]
                 [file-picker]
                 #_[hello-world]]
-      (. js/document (getElementById "app"))))
+               (. js/document (getElementById "app"))))
 
 (defn ^:export init []
   ;; init is called ONCE when the page loads
