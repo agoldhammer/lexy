@@ -7,16 +7,34 @@
 (defonce app-state (atom {:text "Hello world!"}))
 
 (defn hello-world []
-  [:div
-   [:h1 (:text @app-state)]
-   [:h3 "Edit this and watch it change!!!"]
-   [:div.app-cntnr
-    [:p "hello"]]
+  [:section.section
+   [:div.level 
+    [:button.button.is-rounded.level-item.mr-1 (:text @app-state)]
+    [:button.button.level-item.ml-1 "Edit this and watch it change!!!"]]
+   [:div.container
+    [:p "hello"]
+    [:button.button.is-success.is-rounded "txt"]]
    #_[app-scaffold]])
 
+(defn menu []
+  [:nav.navbar.is-primary
+   {:role "navigation" :aria-label "main navigation"}
+   [:div.navbar-brand
+    [:a.navbar-item {:href "#"} "lexy"]
+    [:a.navbar-burger.burger {:role "button"
+                       :aria-label "menu"
+                       :aria-expanded "false"}
+     [:span {:aria-hidden "true"}]
+     [:span {:aria-hidden "true"}]
+     [:span {:aria-hidden "true"}]]]
+   [:div.navbar-menu
+    [:div.navbar-start
+     [:a.navbar-item {:href "#"} "German"]
+     [:a.navbar-item {:href "#"} "Italian"]]]])
+
 (defn start []
-  (rdom/render [hello-world]
-                            (. js/document (getElementById "app"))))
+  (rdom/render [menu] #_[hello-world]
+      (. js/document (getElementById "app"))))
 
 (defn ^:export init []
   ;; init is called ONCE when the page loads
