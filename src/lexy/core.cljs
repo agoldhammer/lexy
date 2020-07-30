@@ -32,8 +32,23 @@
      [:a.navbar-item {:href "#"} "German"]
      [:a.navbar-item {:href "#"} "Italian"]]]])
 
+(defn file-picker []
+  [:table-container 
+   [:div.content
+    [:table.table.is-bordered.is-hoverable
+     [:thead
+      [:tr
+       [:th.has-text-info
+        "File Name"]]]
+     [:tbody
+      [:tr [:th "File1"]]
+      [:tr [:th "file2"]]]]]])
+
 (defn start []
-  (rdom/render [menu] #_[hello-world]
+  (rdom/render [:div
+                [menu ]
+                [file-picker]
+                #_[hello-world]]
       (. js/document (getElementById "app"))))
 
 (defn ^:export init []
