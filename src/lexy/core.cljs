@@ -6,6 +6,11 @@
 
 (defonce app-state (atom {:text "Hello world!"}))
 
+(defn populate-files [lang]
+  (if (= lang :de)
+    (swap! app-state assoc :files ["ger1" "ger2" "ger3"])
+    (swap! app-state assoc :files ["ital1" "ital2" "ital3" "ital4"])))
+
 (defn hello-world []
   [:section.section
    [:div.level
@@ -49,23 +54,36 @@
      [:span {:aria-hidden "true"}]]]
    [:div.navbar-menu
     [:div.navbar-start
-     [:a.navbar-item {:href "#"} "German"]
-     [:a.navbar-item {:href "#"} "Italian"]]]])
+     [:a.navbar-item {:href "#"
+                      :on-click (partial populate-files :de)}
+      "German"]
+     [:a.navbar-item {:href "#"
+                      :on-click (partial populate-files :it)}
+      "Italian"]]]])
+
+(defn make-filemenu-entry [fname]
+  [:tr [:th ^{:key fname}
+        {:id fname
+         :on-click #(js/console.log (-> % .-target .-id))}
+        fname]])
+
+(defn make-filemenu-body [files]
+  (into [:tbody] (map make-filemenu-entry files)))
+
 
 (defn file-picker []
-  [:div.columns.mt-2
-   [:div.column.is-1]
-   [:div.column.is-3
-    [:table-container
-     [:div.content
-      [:table.table.is-bordered.is-hoverable
-       [:thead
-        [:tr
-         [:th.has-text-info
-          "File Name"]]]
-       [:tbody
-        [:tr [:th "File1"]]
-        [:tr [:th "file2"]]]]]]]])
+  (let [files (:files @app-state)]
+    [:div.columns.mt-2
+     [:div.column.is-1]
+     [:div.column.is-3
+      [:table-container
+       [:div.content
+        [:table.table.is-bordered.is-hoverable
+         [:thead
+          [:tr
+           [:th.has-text-info
+            "File Name"]]]
+         (make-filemenu-body files)]]]]]))
 
 (defn start []
   (rdom/render [:div
@@ -85,3 +103,11 @@
   ;; stop is called before any code is reloaded
   ;; this is controlled by :before-load in the config
   (js/console.log "stop"))
+
+
+
+(comment
+  @app-state
+  (make-filemenu-body (:files @app-state))
+  )
+
