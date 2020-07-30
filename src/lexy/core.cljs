@@ -13,8 +13,25 @@
     [:button.button.level-item.ml-1 "Edit this and watch it change!!!"]]
    [:div.container
     [:p "hello"]
-    [:button.button.is-success.is-rounded "txt"]]
-   #_[app-scaffold]])
+    [:button.button.is-success.is-rounded "txt"]]])
+
+(defn word-box [myword]
+  [:div.defholder.mb-2
+   [:span.tag.is-size-4.dark myword]])
+
+(defn def-panel []
+  (let [w "word"
+        d "definition"
+        s "supplement"]
+    [:div.content
+     (word-box w)
+     (word-box d)
+     (word-box s)
+     [:div.field.is-grouped
+      [:button.button.is-rounded.is-warning
+       {:on-click #(js/console.log "clicked")}
+       "ShowDef"]
+      [:button.button.is-rounded.is-success "Right"]]]))
 
 (defn menu []
   [:nav.navbar.is-primary
@@ -36,21 +53,25 @@
      [:a.navbar-item {:href "#"} "Italian"]]]])
 
 (defn file-picker []
-  [:table-container
-   [:div.content
-    [:table.table.is-bordered.is-hoverable
-     [:thead
-      [:tr
-       [:th.has-text-info
-        "File Name"]]]
-     [:tbody
-      [:tr [:th "File1"]]
-      [:tr [:th "file2"]]]]]])
+  [:div.columns.mt-2
+   [:div.column.is-1]
+   [:div.column.is-3
+    [:table-container
+     [:div.content
+      [:table.table.is-bordered.is-hoverable
+       [:thead
+        [:tr
+         [:th.has-text-info
+          "File Name"]]]
+       [:tbody
+        [:tr [:th "File1"]]
+        [:tr [:th "file2"]]]]]]]])
 
 (defn start []
   (rdom/render [:div
                 [menu]
                 [file-picker]
+                [def-panel]
                 #_[hello-world]]
                (. js/document (getElementById "app"))))
 
