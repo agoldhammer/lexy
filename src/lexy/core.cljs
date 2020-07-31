@@ -2,16 +2,28 @@
   (:require [reagent.core :as reagent :refer [atom]]
             [reagent.dom :as rdom]))
 
+;; for development
+(defrecord Slug [rowid src target supp lrd-from lrd-to nseen])
+
+(def a (Slug. 1 "das Wort" "word" "" 0 0 0))
+(def b (Slug. 2 "witzig" "witty" "Er war witzig" 1 0 15))
+
+(def fake-defslugs [a b])
+
 ;; define your app data so that it doesn't get over-written on reload
 
-(defonce app-state (atom {:text "Hello world!"}))
+(defonce app-state (atom {:active-file nil
+                          :batch-size 25
+                          :direction :fwd
+                          :slugs fake-defslugs
+                          :cursor 0}))
 
 (defn populate-files [lang]
   (if (= lang :de)
     (swap! app-state assoc :files ["ger1" "ger2" "ger3"])
     (swap! app-state assoc :files ["ital1" "ital2" "ital3" "ital4"])))
 
-(defn hello-world []
+#_(defn hello-world []
   [:section.section
    [:div.level
     [:button.button.is-rounded.level-item.mr-1 (:text @app-state)]
@@ -19,6 +31,19 @@
    [:div.container
     [:p "hello"]
     [:button.button.is-success.is-rounded "txt"]]])
+
+(defn info-panel []
+  (let [state  @app-state
+        active-file (:active-file state)
+        batch-size (:batch-size state)
+        direction (:direction state)]
+    [:div-level.is-size-7.is-italic.has-text-info
+     [:span.ml-4 "Active file: "]
+     (if active-file
+       [:span active-file]
+       [:span "None"])
+     [:span.ml-4 (str "Batch size: " batch-size)]
+     [:span.ml-4 (str "Dir: "  (name direction))]]))
 
 (defn word-box [myword]
   [:div.defholder.mb-2
@@ -88,6 +113,7 @@
 (defn start []
   (rdom/render [:div
                 [menu]
+                [info-panel]
                 [file-picker]
                 [def-panel]
                 #_[hello-world]]
