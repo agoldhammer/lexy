@@ -20,7 +20,7 @@
                             :cursor 0
                             :def-showing? false}))
 
-(defn populate-files 
+(defn populate-files
   "add nemes of available files to the db"
   [lang]
   (if (= lang :de)
@@ -41,16 +41,16 @@
      [:span.ml-4 (str "Batch size: " batch-size)]
      [:span.ml-4 (str "Dir: "  (name direction))]]))
 
-(defn word-box 
+(defn word-box
   "element for displaying word def, and supplement"
   [myword]
   [:div.defholder.mb-2.has-background-white-ter.mr-6
    [:span.tag.is-size-4.dark myword]])
 
 (defn toggle-def-showing
- "Toggle def-showing? in def-panel-state"
+  "Toggle def-showing? in def-panel-state"
   []
-  (swap! def-panel-state update-in [:def-showing?] not ))
+  (swap! def-panel-state update-in [:def-showing?] not))
 
 (defn bump-cursor
   "bump cursor on slugs list in def-panel-state"
@@ -69,7 +69,7 @@
   (toggle-def-showing)
   (bump-cursor))
 
-(defn def-panel 
+(defn def-panel
   "view with word and defs"
   []
   (let [{:keys [slugs cursor def-showing?]} @def-panel-state
@@ -87,7 +87,7 @@
         [:button.button.is-rounded.is-warning
          {:on-click toggle-def-showing}
          "ShowDef"]
-        [:div.field.is-grouped 
+        [:div.field.is-grouped
          [:button.button.is-rounded.is-success.ml-4
           {:on-click right-action}
           "Right"]
@@ -120,17 +120,26 @@
                       :on-click (partial populate-files :it)}
       "Italian"]]]])
 
-(defn make-filemenu-entry [fname]
+(defn set-active-file
+  "set active file name in app-state"
+  [fname]
+  (swap! app-state assoc-in [:active-file] fname))
+
+(defn make-filemenu-entry
+  "helper to create file table row"
+  [fname]
   [:tr [:th ^{:key fname}
         {:id fname
-         :on-click #(js/console.log (-> % .-target .-id))}
+         :on-click #(set-active-file (-> % .-target .-id))}
         fname]])
 
-(defn make-filemenu-body [files]
+(defn make-filemenu-body
+  "helper to create file table body"
+  [files]
   (into [:tbody] (map make-filemenu-entry files)))
 
 
-(defn file-picker 
+(defn file-picker
   "view for choosing files"
   []
   (let [files (:files @app-state)]
@@ -146,14 +155,28 @@
             "File Name"]]]
          (make-filemenu-body files)]]]]]))
 
+(defn have-active-file?
+  "has active file been set in app-state?"
+  []
+  (not (nil? (:active-file @app-state))))
+
+(defn start-panel
+  "initial view before active file chosen"
+  []
+  [:div
+   [menu]
+   [info-panel]])
+
 (defn start []
-  (rdom/render [:div
-                [menu]
-                [info-panel]
-                [file-picker]
-                [def-panel]
-                #_[hello-world]]
-               (. js/document (getElementById "app"))))
+  (rdom/render
+   [:div
+    [menu]
+    [info-panel]
+    [:div#picker
+     [file-picker]]
+    [def-panel]
+    #_[hello-world]]
+   (. js/document (getElementById "app"))))
 
 (defn ^:export init []
   ;; init is called ONCE when the page loads
