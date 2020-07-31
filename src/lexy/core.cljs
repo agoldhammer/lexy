@@ -145,7 +145,6 @@
   [files]
   (into [:tbody] (map make-filemenu-entry files)))
 
-
 (defn file-picker
   "view for choosing files"
   []
@@ -197,7 +196,7 @@
   (rdom/render (view) (. js/document (getElementById "app"))))
 
 (defn start
- "render the initial view"
+  "render the initial view"
   []
   (render-view start-panel))
 
