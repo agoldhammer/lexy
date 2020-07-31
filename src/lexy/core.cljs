@@ -2,6 +2,11 @@
   (:require [reagent.core :as reagent :refer [atom]]
             [reagent.dom :as rdom]))
 
+;; forward defs
+(declare picker-view)
+(declare render-view)
+(declare def-view)
+
 ;; for development
 (defrecord Slug [rowid src target supp lrd-from lrd-to nseen])
 
@@ -25,7 +30,8 @@
   [lang]
   (if (= lang :de)
     (swap! app-state assoc :files ["ger1" "ger2" "ger3"])
-    (swap! app-state assoc :files ["ital1" "ital2" "ital3" "ital4"])))
+    (swap! app-state assoc :files ["ital1" "ital2" "ital3" "ital4"]))
+  (render-view picker-view))
 
 (defn info-panel
   "panel displaying info about current active settings"
@@ -123,7 +129,8 @@
 (defn set-active-file
   "set active file name in app-state"
   [fname]
-  (swap! app-state assoc-in [:active-file] fname))
+  (swap! app-state assoc-in [:active-file] fname)
+  (render-view def-view))
 
 (defn make-filemenu-entry
   "helper to create file table row"
@@ -143,7 +150,7 @@
   "view for choosing files"
   []
   (let [files (:files @app-state)]
-    [:div.columns.mt-2
+    [:div#picker.columns.mt-2
      [:div.column.is-1]
      [:div.column.is-3
       [:table-container
@@ -167,16 +174,32 @@
    [menu]
    [info-panel]])
 
-(defn start []
-  (rdom/render
-   [:div
-    [menu]
-    [info-panel]
-    [:div#picker
-     [file-picker]]
-    [def-panel]
-    #_[hello-world]]
-   (. js/document (getElementById "app"))))
+(defn picker-view
+  "view with file-picker showing"
+  []
+  [:div#top
+   [menu]
+   [info-panel]
+   [:div#picker
+    [file-picker]]])
+
+(defn def-view
+  "view with defs and associatedbuttons"
+  []
+  [:div#top
+   [menu]
+   [info-panel]
+   [def-panel]])
+
+(defn render-view
+  "render a defined view"
+  [view]
+  (rdom/render (view) (. js/document (getElementById "app"))))
+
+(defn start
+ "render the initial view"
+  []
+  (render-view start-panel))
 
 (defn ^:export init []
   ;; init is called ONCE when the page loads
@@ -194,4 +217,5 @@
 (comment
   @app-state
   (make-filemenu-body (:files @app-state)))
+;; https://stackoverflow.com/questions/42142239/how-to-create-a-appendchild-reagent-element))
 
