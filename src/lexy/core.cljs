@@ -14,29 +14,25 @@
 
 (defonce app-state (atom {:active-file nil
                           :batch-size 25
-                          :direction :fwd
-                          :slugs fake-defslugs
-                          :cursor 0}))
+                          :direction :fwd}))
 
-(defn populate-files [lang]
+(def def-panel-state (atom {:slugs fake-defslugs
+                            :cursor 0
+                            :def-showing? false}))
+
+(defn populate-files 
+  "add nemes of available files to the db"
+  [lang]
   (if (= lang :de)
     (swap! app-state assoc :files ["ger1" "ger2" "ger3"])
     (swap! app-state assoc :files ["ital1" "ital2" "ital3" "ital4"])))
 
-#_(defn hello-world []
-  [:section.section
-   [:div.level
-    [:button.button.is-rounded.level-item.mr-1 (:text @app-state)]
-    [:button.button.level-item.ml-1 "Edit this and watch it change!!!"]]
-   [:div.container
-    [:p "hello"]
-    [:button.button.is-success.is-rounded "txt"]]])
-
-(defn info-panel []
-  (let [state  @app-state
-        active-file (:active-file state)
-        batch-size (:batch-size state)
-        direction (:direction state)]
+(defn info-panel
+  "panel displaying info about current active settings"
+  []
+  (let [{:keys [active-file
+                batch-size
+                direction]} @app-state]
     [:div-level.is-size-7.is-italic.has-text-info
      [:span.ml-4 "Active file: "]
      (if active-file
@@ -45,25 +41,63 @@
      [:span.ml-4 (str "Batch size: " batch-size)]
      [:span.ml-4 (str "Dir: "  (name direction))]]))
 
-(defn word-box [myword]
-  [:div.defholder.mb-2
+(defn word-box 
+  "element for displaying word def, and supplement"
+  [myword]
+  [:div.defholder.mb-2.has-background-white-ter.mr-6
    [:span.tag.is-size-4.dark myword]])
 
-(defn def-panel []
-  (let [w "word"
-        d "definition"
-        s "supplement"]
-    [:div.content
-     (word-box w)
-     (word-box d)
-     (word-box s)
-     [:div.field.is-grouped
-      [:button.button.is-rounded.is-warning
-       {:on-click #(js/console.log "clicked")}
-       "ShowDef"]
-      [:button.button.is-rounded.is-success "Right"]]]))
+(defn toggle-def-showing
+ "Toggle def-showing? in def-panel-state"
+  []
+  (swap! def-panel-state update-in [:def-showing?] not ))
 
-(defn menu []
+(defn bump-cursor
+  "bump cursor on slugs list in def-panel-state"
+  []
+  (swap! def-panel-state update-in [:cursor] inc))
+
+(defn right-action
+  "on clicking right button"
+  []
+  (toggle-def-showing)
+  (bump-cursor))
+
+(defn wrong-action
+  "on clicking wrong button"
+  []
+  (toggle-def-showing)
+  (bump-cursor))
+
+(defn def-panel 
+  "view with word and defs"
+  []
+  (let [{:keys [slugs cursor def-showing?]} @def-panel-state
+        slug (nth slugs cursor nil)]
+    [:div.content.ml-2.mr-10
+     (word-box (:src slug))
+     (when def-showing?
+       (word-box (:target slug)))
+     (when def-showing?
+       (let [supp (:supp slug)]
+         (when (not= supp "")
+           (word-box (:supp slug)))))
+     [:div.field.is-grouped
+      (if (not def-showing?)
+        [:button.button.is-rounded.is-warning
+         {:on-click toggle-def-showing}
+         "ShowDef"]
+        [:div.field.is-grouped 
+         [:button.button.is-rounded.is-success.ml-4
+          {:on-click right-action}
+          "Right"]
+         [:button.button.is-rounded.is-danger.ml-4
+          {:on-click wrong-action}
+          "Wrong"]])]]))
+
+(defn menu
+  "fixed menu view"
+  []
   [:nav.navbar.is-primary
    {:role "navigation" :aria-label "main navigation"}
    [:div.navbar-brand
@@ -96,7 +130,9 @@
   (into [:tbody] (map make-filemenu-entry files)))
 
 
-(defn file-picker []
+(defn file-picker 
+  "view for choosing files"
+  []
   (let [files (:files @app-state)]
     [:div.columns.mt-2
      [:div.column.is-1]
@@ -134,6 +170,5 @@
 
 (comment
   @app-state
-  (make-filemenu-body (:files @app-state))
-  )
+  (make-filemenu-body (:files @app-state)))
 
