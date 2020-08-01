@@ -50,7 +50,7 @@
 (defn word-box
   "element for displaying word def, and supplement"
   [myword]
-  [:div.defholder.mb-2.has-background-white-ter.mr-6
+  [:div.defholder.my-3.has-background-white-ter.mr-6
    [:span.tag.is-size-4.dark myword]])
 
 (defn toggle-def-showing
@@ -80,26 +80,29 @@
   []
   (let [{:keys [slugs cursor def-showing?]} @def-panel-state
         slug (nth slugs cursor nil)]
-    [:div.content.ml-2.mr-10
-     (word-box (:src slug))
-     (when def-showing?
-       (word-box (:target slug)))
-     (when def-showing?
-       (let [supp (:supp slug)]
-         (when (not= supp "")
-           (word-box (:supp slug)))))
-     [:div.field.is-grouped
-      (if (not def-showing?)
-        [:button.button.is-rounded.is-warning
-         {:on-click toggle-def-showing}
-         "ShowDef"]
-        [:div.field.is-grouped
-         [:button.button.is-rounded.is-success.ml-4
-          {:on-click right-action}
-          "Right"]
-         [:button.button.is-rounded.is-danger.ml-4
-          {:on-click wrong-action}
-          "Wrong"]])]]))
+    (if slug 
+      [:div.content.ml-2.mr-10
+       (word-box (:src slug))
+       (when def-showing?
+         (word-box (:target slug)))
+       (when def-showing?
+         (let [supp (:supp slug)]
+           (when (not= supp "")
+             (word-box (:supp slug)))))
+       [:div.field.is-grouped
+        (if (not def-showing?)
+          [:button.button.is-rounded.is-warning
+           {:on-click toggle-def-showing}
+           "ShowDef"]
+          [:div.field.is-grouped
+           [:button.button.is-rounded.is-success.ml-4
+            {:on-click right-action}
+            "Right"]
+           [:button.button.is-rounded.is-danger.ml-4
+            {:on-click wrong-action}
+            "Wrong"]])]]
+      ; else if slug is nil
+        [:div [:span "Batch complete"]])))
 
 (defn menu
   "fixed menu view"
