@@ -3,5 +3,7 @@ package-lock.json
 /.shadow-cljs
 /public/js/compiled
 /.calva
+yarn.lock
+
 
 

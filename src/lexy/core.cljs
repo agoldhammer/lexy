@@ -1,6 +1,9 @@
 (ns lexy.core
   (:require [reagent.core :as reagent :refer [atom]]
-            [reagent.dom :as rdom]))
+            [reagent.dom :as rdom]
+            [lexy.client :as client]))
+
+(def DEBUG true)
 
 ;; forward defs
 (declare picker-view)
@@ -19,18 +22,26 @@
 
 (defonce app-state (atom {:active-file nil
                           :batch-size 25
-                          :direction :fwd}))
+                          :direction :fwd
+                          :files []}))
 
 (def def-panel-state (atom {:slugs fake-defslugs
                             :cursor 0
                             :def-showing? false}))
 
+(defn file-list-handler [response]
+  (when DEBUG (print response))
+  (swap! app-state merge response))
+
 (defn populate-files
   "add nemes of available files to the db"
   [lang]
-  (if (= lang :de)
-    (swap! app-state assoc :files ["ger1" "ger2" "ger3"])
-    (swap! app-state assoc :files ["ital1" "ital2" "ital3" "ital4"]))
+  (let [handler file-list-handler
+        pattern (cond
+                  (= lang :de) "german"
+                  (= lang :it) "italian"
+                  (= lang :test) "test")]
+    (client/get-endpoint (str "/files/" pattern) handler))
   (render-view picker-view))
 
 (defn info-panel
@@ -80,7 +91,7 @@
   []
   (let [{:keys [slugs cursor def-showing?]} @def-panel-state
         slug (nth slugs cursor nil)]
-    (if slug 
+    (if slug
       [:div.content.ml-2.mr-10
        (word-box (:src slug))
        (when def-showing?
@@ -102,7 +113,7 @@
             {:on-click wrong-action}
             "Wrong"]])]]
       ; else if slug is nil
-        [:div [:span "Batch complete"]])))
+      [:div [:span "Batch complete"]])))
 
 (defn menu
   "fixed menu view"
@@ -127,7 +138,10 @@
       "German"]
      [:a.navbar-item {:href "#"
                       :on-click (partial populate-files :it)}
-      "Italian"]]]])
+      "Italian"]
+     [:a.navbar-item {:href "#"
+                      :on-click (partial populate-files :test)}
+      "Test"]]]])
 
 (defn set-active-file
   "set active file name in app-state"
