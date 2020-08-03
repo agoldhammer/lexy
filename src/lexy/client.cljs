@@ -2,8 +2,6 @@
   (:require
    [ajax.core :as ajax :refer [GET]]))
 
-(defonce test-server "http://localhost:5000")
-
 (declare debug-handler)
 (declare error-handler)
 

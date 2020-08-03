@@ -1,5 +1,5 @@
 (ns lexy.core
-  (:require [reagent.core :as reagent :refer [atom]]
+  (:require [reagent.core :as reagent]
             [reagent.dom :as rdom]
             [lexy.client :as client]))
 
@@ -13,20 +13,21 @@
 ;; for development
 (defrecord Slug [rowid src target supp lrd-from lrd-to nseen])
 
-(def a (Slug. 1 "das Wort" "word" "" 0 0 0))
-(def b (Slug. 2 "witzig" "witty" "Er war witzig" 1 0 15))
+#_(def a (Slug. 1 "das Wort" "word" "" 0 0 0))
+#_(def b (Slug. 2 "witzig" "witty" "Er war witzig" 1 0 15))
 
-(def fake-defslugs [a b])
+#_(def fake-defslugs [a b])
 
 ;; define your app data so that it doesn't get over-written on reload
 
-(defonce app-state (atom {:active-file nil
+(defonce app-state (reagent/atom {:active-file nil
                           :batch-size 25
                           :direction :fwd
                           :files []}))
 
-(def def-panel-state (atom {:slugs fake-defslugs
+(def def-panel-state (reagent/atom {:slugs []
                             :cursor 0
+                            :defs-loading? true
                             :def-showing? false}))
 
 (defn file-list-handler [response]
@@ -89,31 +90,38 @@
 (defn def-panel
   "view with word and defs"
   []
-  (let [{:keys [slugs cursor def-showing?]} @def-panel-state
+  (let [{:keys [slugs cursor def-showing? defs-loading?]}
+        @def-panel-state
         slug (nth slugs cursor nil)]
-    (if slug
-      [:div.content.ml-2.mr-10
-       (word-box (:src slug))
-       (when def-showing?
-         (word-box (:target slug)))
-       (when def-showing?
-         (let [supp (:supp slug)]
-           (when (not= supp "")
-             (word-box (:supp slug)))))
-       [:div.field.is-grouped
-        (if (not def-showing?)
-          [:button.button.is-rounded.is-warning
-           {:on-click toggle-def-showing}
-           "ShowDef"]
-          [:div.field.is-grouped
-           [:button.button.is-rounded.is-success.ml-4
-            {:on-click right-action}
-            "Right"]
-           [:button.button.is-rounded.is-danger.ml-4
-            {:on-click wrong-action}
-            "Wrong"]])]]
-      ; else if slug is nil
-      [:div [:span "Batch complete"]])))
+    (when DEBUG
+      (print "def-panel: " defs-loading? slug cursor
+             (first slugs)))
+    (if defs-loading?
+      [:div [:span "Defs loading"]]
+      ;; else not loading
+      (if slug
+        [:div.content.ml-2.mr-10
+         (word-box (:src slug))
+         (when def-showing?
+           (word-box (:target slug)))
+         (when def-showing?
+           (let [supp (:supp slug)]
+             (when (not= supp "")
+               (word-box (:supp slug)))))
+         [:div.field.is-grouped
+          (if (not def-showing?)
+            [:button.button.is-rounded.is-warning
+             {:on-click toggle-def-showing}
+             "ShowDef"]
+            [:div.field.is-grouped
+             [:button.button.is-rounded.is-success.ml-4
+              {:on-click right-action}
+              "Right"]
+             [:button.button.is-rounded.is-danger.ml-4
+              {:on-click wrong-action}
+              "Wrong"]])]]
+        ;; else if slug is nil
+        [:div [:span "Batch complete"]]))))
 
 (defn menu
   "fixed menu view"
@@ -134,19 +142,36 @@
    [:div.navbar-menu
     [:div.navbar-start
      [:a.navbar-item {:href "#"
-                      :on-click (partial populate-files :de)}
+                      :on-click #(populate-files :de)}
       "German"]
      [:a.navbar-item {:href "#"
-                      :on-click (partial populate-files :it)}
+                      :on-click #(populate-files :it)}
       "Italian"]
      [:a.navbar-item {:href "#"
-                      :on-click (partial populate-files :test)}
+                      :on-click #(populate-files :test)}
       "Test"]]]])
+
+(defn slug-handler
+  "set slugs in def-panel-state"
+  [response]
+  (when DEBUG (print "slug-handler: resp: " response))
+  (let [slugs (mapv #(apply ->Slug %) (:slugs response))
+        response1 (merge response {:slugs slugs})
+        new-state (merge response1 {:cursor 0
+                                    :defs-loading? false
+                                    :def-showing? false})]
+    (when DEBUG
+      (print "slug-handler: 2slugs: " (take 2 slugs))
+      (print "loading: " (:defs-loading? new-state)))
+    (swap! def-panel-state merge new-state)))
 
 (defn set-active-file
   "set active file name in app-state"
   [fname]
   (swap! app-state assoc-in [:active-file] fname)
+  (client/set-db fname)
+  (client/get-endpoint (str "/fetch") slug-handler)
+  (print "set-active-file done")
   (render-view def-view))
 
 (defn make-filemenu-entry
@@ -205,7 +230,7 @@
   [:div#top
    [menu]
    [info-panel]
-   [def-panel]])
+   [def-panel def-panel-state]])
 
 (defn render-view
   "render a defined view"
@@ -235,3 +260,5 @@
   (make-filemenu-body (:files @app-state)))
 ;; https://stackoverflow.com/questions/42142239/how-to-create-a-appendchild-reagent-element))
 
+;; NEXT STEPS implement batch size, display counts. deal with fwd and bkwd
+;; 
