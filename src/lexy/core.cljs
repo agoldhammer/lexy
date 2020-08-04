@@ -3,7 +3,7 @@
             [reagent.dom :as rdom]
             [lexy.client :as client]))
 
-(def DEBUG true)
+(def DEBUG false)
 
 ;; forward defs
 (declare picker-view)
@@ -45,6 +45,14 @@
     (client/get-endpoint (str "/files/" pattern) handler))
   (render-view picker-view))
 
+(defn tagged-text
+  "elt of info panel
+    displays tag with text if not nil, else none"
+  [tag text-or-nil]
+  (if-let [text text-or-nil]
+    [:span.ml-4 (str tag ": " text)]
+    [:span.ml-4 (str tag ": None")]))
+
 (defn info-panel
   "panel displaying info about current active settings"
   []
@@ -52,12 +60,9 @@
                 batch-size
                 direction]} @app-state]
     [:div-level.is-size-7.is-italic.has-text-info
-     [:span.ml-4 "Active file: "]
-     (if active-file
-       [:span active-file]
-       [:span "None"])
-     [:span.ml-4 (str "Batch size: " batch-size)]
-     [:span.ml-4 (str "Dir: "  (name direction))]]))
+     (tagged-text "Active file" active-file)
+     (tagged-text "Batch size" batch-size)
+     (tagged-text "Dir" (name direction))]))
 
 (defn word-box
   "element for displaying word def, and supplement"
