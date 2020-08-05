@@ -1,6 +1,8 @@
 (ns lexy.core
   (:require [reagent.core :as reagent]
             [reagent.dom :as rdom]
+            [reagent.session :as session]
+            #_[require reagent.cookies :as cookies]
             [lexy.client :as client]))
 
 (def DEBUG false)
@@ -21,14 +23,15 @@
 ;; define your app data so that it doesn't get over-written on reload
 
 (defonce app-state (reagent/atom {:active-file nil
-                          :batch-size 25
-                          :direction :fwd
-                          :files []}))
+                                  :batch-size 25
+                                  :direction :fwd
+                                  :files []
+                                  :login-showing? true}))
 
 (def def-panel-state (reagent/atom {:slugs []
-                            :cursor 0
-                            :defs-loading? true
-                            :def-showing? false}))
+                                    :cursor 0
+                                    :defs-loading? true
+                                    :def-showing? false}))
 
 (defn file-list-handler [response]
   (when DEBUG (print response))
@@ -93,11 +96,18 @@
   (bump-cursor))
 
 (defn def-panel
-  "view with word and defs"
+  "view with word and defs; choose dir randomly"
   []
   (let [{:keys [slugs cursor def-showing? defs-loading?]}
         @def-panel-state
-        slug (nth slugs cursor nil)]
+        slug (nth slugs cursor nil)
+        dir (rand-int 2)
+        [src, target, supp] (if (= dir 0)
+                              ((juxt :src :target :supp) slug)
+                              ((juxt :target :src :supp) slug))
+        glosbe-url (if (= dir 0)
+                     "https://glosbe.com/de/en/"
+                     "https://glosbe.com/en/de/")]
     (when DEBUG
       (print "def-panel: " defs-loading? slug cursor
              (first slugs)))
@@ -106,13 +116,12 @@
       ;; else not loading
       (if slug
         [:div.content.ml-2.mr-10
-         (word-box (:src slug))
+         (word-box src)
          (when def-showing?
-           (word-box (:target slug)))
-         (when def-showing?
-           (let [supp (:supp slug)]
-             (when (not= supp "")
-               (word-box (:supp slug)))))
+           (word-box target))
+         (when (and def-showing?
+                    (not= supp ""))
+           (word-box (:supp slug)))
          [:div.field.is-grouped
           (if (not def-showing?)
             [:button.button.is-rounded.is-warning
@@ -124,9 +133,42 @@
               "Right"]
              [:button.button.is-rounded.is-danger.ml-4
               {:on-click wrong-action}
-              "Wrong"]])]]
+              "Wrong"]])]
+         [:div.field.is-grouped
+          [:button.button.is-rounded.has-background-light.ml-2
+           {:on-click #(.open js/window
+                              (str "https://www.dict.cc/?s=" src)
+                              "_blank")}
+           "Lkup dict.cc"]
+          [:button.button.is-rounded.has-background-light.ml-4
+           {:on-click #(.open js/window
+                              (str glosbe-url src)
+                              "_blank")}
+           "Lkup Glosbe"]]]
         ;; else if slug is nil
         [:div [:span "Batch complete"]]))))
+
+(defn login-box
+  "login element"
+  []
+  (let [logged-in? (session/get :username)
+        login-showing? (:login-showing? @app-state)
+        close-login-box #(swap! app-state assoc :login-showing?
+                                false)]
+    (print "login-box" logged-in?)
+    (when (and login-showing?
+               (not logged-in?))
+      [:div.modal.is-active
+       [:div.modal-background.has-background-light-gray]
+       [:div.modal-card
+        [:header.modal-card-head
+         [:p.modal-card-title "login"]]
+        [:section.modal-card-body "content"]
+        [:footer.modal-card-foot
+         [:button.button.is-success
+          {:on-click close-login-box} "Login"]
+         [:button.button
+          {:on-click close-login-box} "Cancel"]]]])))
 
 (defn menu
   "fixed menu view"
@@ -217,6 +259,7 @@
   "initial view before active file chosen"
   []
   [:div
+   [login-box]
    [menu]
    [info-panel]])
 
@@ -262,7 +305,10 @@
 
 (comment
   @app-state
-  (make-filemenu-body (:files @app-state)))
+  (. js/document -location)
+  (make-filemenu-body (:files @app-state))
+  (.open js/window "https://www.dict.cc/?s=schalten", "_blank"))
+
 ;; https://stackoverflow.com/questions/42142239/how-to-create-a-appendchild-reagent-element))
 
 ;; NEXT STEPS implement batch size, display counts. deal with fwd and bkwd
