@@ -148,6 +148,18 @@
         ;; else if slug is nil
         [:div [:span "Batch complete"]]))))
 
+(defn id->value
+  "get value of element with specified id"
+  [id]
+  (let [elt (. js/document getElementById id)]
+    (.-value elt)))
+
+(defn submit-login
+  "gather values from login box and submit to server"
+  []
+  (let [[un pw lang] (mapv id->value ["un" "pw" "lang"])]
+    (print un pw lang)))
+
 (defn login-box
   "login element"
   []
@@ -167,16 +179,16 @@
          [:div.field
           [:label.label "Username"]
           [:div.control
-           [:input.input {:type "text"
+           [:input#un.input {:type "text"
                                      :placeholder "username"}]]
           [:label.label "Password"]
           [:div.control
-           [:input.input {:type "text"
+           [:input#pw.input {:type "text"
                                      :placeholder "password"}]]
           [:label.label "Language"]
           [:div.select
            [:div.control
-            [:select
+            [:select#lang
              [:option "German"]
              [:option "Italian"]
              [:option "Test"]]]]
@@ -184,7 +196,7 @@
         
         [:footer.modal-card-foot
          [:button.button.is-success
-          {:on-click close-login-box} "Login"]
+          {:on-click submit-login} "Login"]
          [:button.button
           {:on-click close-login-box} "Cancel"]]]])))
 
