@@ -162,8 +162,26 @@
        [:div.modal-background.has-background-light-gray]
        [:div.modal-card
         [:header.modal-card-head
-         [:p.modal-card-title "login"]]
-        [:section.modal-card-body "content"]
+         [:p.modal-card-title "Lexy Login"]]
+        [:section.modal-card-body 
+         [:div.field
+          [:label.label "Username"]
+          [:div.control
+           [:input.input {:type "text"
+                                     :placeholder "username"}]]
+          [:label.label "Password"]
+          [:div.control
+           [:input.input {:type "text"
+                                     :placeholder "password"}]]
+          [:label.label "Language"]
+          [:div.select
+           [:div.control
+            [:select
+             [:option "German"]
+             [:option "Italian"]
+             [:option "Test"]]]]
+        ]]
+        
         [:footer.modal-card-foot
          [:button.button.is-success
           {:on-click close-login-box} "Login"]
