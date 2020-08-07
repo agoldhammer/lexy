@@ -1,6 +1,6 @@
 (ns lexy.client
   (:require
-   [ajax.core :as ajax :refer [GET]]))
+   [ajax.core :as ajax :refer [GET POST]]))
 
 (declare debug-handler)
 (declare error-handler)
@@ -30,6 +30,14 @@
   (GET endpoint
     (merge (default-request-map) {:handler handler})))
 
+(defn post-endpoint
+  "post endpoint from vocab server"
+  [endpoint params handler]
+  (POST endpoint
+    (merge (default-request-map) {:handler handler
+                                  :format :json
+                                  :params params})))
+
 (defn set-db
   "set db to use on server"
   [dbname]
@@ -47,5 +55,10 @@
   []
   (GET (str "/getcount")
     (default-request-map)))
+
+(defn login
+  "send login data to server"
+  [params]
+  (post-endpoint "/login" params nil))
 
 
