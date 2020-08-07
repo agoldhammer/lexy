@@ -158,7 +158,10 @@
   "gather values from login box and submit to server"
   []
   (let [[un pw lang] (mapv id->value ["un" "pw" "lang"])]
-    (print un pw lang)))
+    (print un pw lang)
+    (client/login {:username un
+                   :password pw
+                   :lang lang} client/debug-handler)))
 
 (defn login-box
   "login element"
