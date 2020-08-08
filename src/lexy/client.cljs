@@ -38,7 +38,7 @@
                                   :format :json
                                   :params params})))
 
-(defn set-db
+#_(defn set-db
   "set db to use on server"
   [dbname]
   (GET (str "/seldb/" dbname)
@@ -47,6 +47,7 @@
 (defn fetch
   "fetch slugs from selected db"
   []
+  (print "fetching")
   (GET (str "/fetch")
     (default-request-map)))
 

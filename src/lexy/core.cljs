@@ -1,7 +1,7 @@
 (ns lexy.core
   (:require [reagent.core :as reagent]
             [reagent.dom :as rdom]
-            [reagent.session :as session]
+            #_[reagent.session :as session]
             #_[require reagent.cookies :as cookies]
             [lexy.client :as client]))
 
@@ -15,11 +15,6 @@
 ;; for development
 (defrecord Slug [rowid src target supp lrd-from lrd-to nseen])
 
-#_(def a (Slug. 1 "das Wort" "word" "" 0 0 0))
-#_(def b (Slug. 2 "witzig" "witty" "Er war witzig" 1 0 15))
-
-#_(def fake-defslugs [a b])
-
 ;; define your app data so that it doesn't get over-written on reload
 
 (defonce app-state (reagent/atom {:active-file nil
@@ -28,17 +23,22 @@
                                   :files []
                                   :login-showing? true}))
 
-(def def-panel-state (reagent/atom {:slugs []
-                                    :cursor 0
-                                    :dir 0
-                                    :defs-loading? true
-                                    :def-showing? false}))
+(defonce default-panel-state {:slugs []
+                              :cursor 0
+                              :dir 0
+                              :defs-loading? true
+                              :def-showing? false})
 
-(defn file-list-handler [response]
+(def def-panel-state (reagent/atom default-panel-state))
+
+(defn reset-def-panel! []
+  (reset! def-panel-state default-panel-state))
+
+#_(defn file-list-handler [response]
   (when DEBUG (print response))
   (swap! app-state merge response))
 
-(defn populate-files
+#_(defn populate-files
   "add nemes of available files to the db"
   [lang]
   (let [handler file-list-handler
@@ -161,17 +161,18 @@
 (defn login-handler
   "handle response from the login endpoint"
   [response]
-  (let [active-db (session/get :active-db)]
-    (print "login-handler: " response)
-    (if (= (:login response) "rejected")
-      (print "bad login")
-      (set-active-file active-db))))
+  (print "login-handler: " response)
+  (if (= (:login response) "rejected")
+    (do (print "bad login")
+        (set-active-file nil))
+    (print "good login")))
 
 (defn submit-login
   "gather values from login box and submit to server"
   []
   (let [[un pw lang] (mapv id->value ["un" "pw" "lang"])]
     (print un pw lang)
+    (set-active-file lang)
     (client/login {:username un
                    :password pw
                    :lang lang}
@@ -180,13 +181,10 @@
 (defn login-box
   "login element"
   []
-  (let [logged-in? (session/get :username)
-        login-showing? (:login-showing? @app-state)
+  (let [login-showing? (:login-showing? @app-state)
         close-login-box #(swap! app-state assoc :login-showing?
                                 false)]
-    (print "login-box" logged-in?)
-    (when (and login-showing?
-               (not logged-in?))
+    (when login-showing?
       [:div.modal.is-active
        [:div.modal-background.has-background-light-gray]
        [:div.modal-card
@@ -197,11 +195,11 @@
           [:label.label "Username"]
           [:div.control
            [:input#un.input {:type "text"
-                                     :placeholder "username"}]]
+                             :placeholder "username"}]]
           [:label.label "Password"]
           [:div.control
            [:input#pw.input {:type "text"
-                                     :placeholder "password"}]]
+                             :placeholder "password"}]]
           [:label.label "Language"]
           [:div.select
            [:div.control
@@ -209,7 +207,7 @@
              [:option "German"]
              [:option "Italian"]
              [:option "Test"]]]]
-        ]]
+          ]]
         
         [:footer.modal-card-foot
          [:button.button.is-success
@@ -233,7 +231,7 @@
      [:span {:aria-hidden "true"}]
      [:span {:aria-hidden "true"}]
      [:span {:aria-hidden "true"}]]]
-   [:div.navbar-menu
+   #_[:div.navbar-menu
     [:div.navbar-start
      [:a.navbar-item {:href "#"
                       :on-click #(populate-files :de)}
@@ -346,6 +344,7 @@
 (defn stop []
   ;; stop is called before any code is reloaded
   ;; this is controlled by :before-load in the config
+  (reset-def-panel!)
   (js/console.log "stop"))
 
 
