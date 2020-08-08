@@ -21,7 +21,7 @@
   #_(.log js/console response))
 
 (defn error-handler [{:keys [status status-text]}]
-  (print "ajax error:" status status-text)
+  (print "lexy ajax error:" status status-text)
   #_(.log js/console (str "AJAX error" status " " status-text)))
 
 (defn get-endpoint
@@ -58,7 +58,7 @@
 
 (defn login
   "send login data to server"
-  [params]
-  (post-endpoint "/login" params nil))
+  [params handler]
+  (post-endpoint "/login" params handler))
 
 

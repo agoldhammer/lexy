@@ -156,6 +156,17 @@
   (let [elt (. js/document getElementById id)]
     (.-value elt)))
 
+(declare set-active-file)
+
+(defn login-handler
+  "handle response from the login endpoint"
+  [response]
+  (let [active-db (session/get :active-db)]
+    (print "login-handler: " response)
+    (if (= (:login response) "rejected")
+      (print "bad login")
+      (set-active-file active-db))))
+
 (defn submit-login
   "gather values from login box and submit to server"
   []
@@ -163,7 +174,8 @@
     (print un pw lang)
     (client/login {:username un
                    :password pw
-                   :lang lang})))
+                   :lang lang}
+                  login-handler)))
 
 (defn login-box
   "login element"
@@ -251,7 +263,7 @@
   "set active file name in app-state"
   [fname]
   (swap! app-state assoc-in [:active-file] fname)
-  (client/set-db fname)
+  #_(client/set-db fname)
   (client/get-endpoint (str "/fetch") slug-handler)
   (print "set-active-file done")
   (render-view def-view))
