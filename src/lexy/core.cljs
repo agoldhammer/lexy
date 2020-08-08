@@ -30,6 +30,7 @@
 
 (def def-panel-state (reagent/atom {:slugs []
                                     :cursor 0
+                                    :dir 0
                                     :defs-loading? true
                                     :def-showing? false}))
 
@@ -87,21 +88,22 @@
   "on clicking right button"
   []
   (toggle-def-showing)
+  (swap! def-panel-state assoc :dir (rand-int 2))
   (bump-cursor))
 
 (defn wrong-action
   "on clicking wrong button"
   []
   (toggle-def-showing)
+  (swap! def-panel-state assoc :dir (rand-int 2))
   (bump-cursor))
 
 (defn def-panel
   "view with word and defs; choose dir randomly"
   []
-  (let [{:keys [slugs cursor def-showing? defs-loading?]}
+  (let [{:keys [slugs dir cursor def-showing? defs-loading?]}
         @def-panel-state
         slug (nth slugs cursor nil)
-        dir (rand-int 2)
         [src, target, supp] (if (= dir 0)
                               ((juxt :src :target :supp) slug)
                               ((juxt :target :src :supp) slug))
@@ -161,7 +163,7 @@
     (print un pw lang)
     (client/login {:username un
                    :password pw
-                   :lang lang} client/debug-handler)))
+                   :lang lang})))
 
 (defn login-box
   "login element"
