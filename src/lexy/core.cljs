@@ -3,7 +3,8 @@
             [reagent.dom :as rdom]
             #_[reagent.session :as session]
             #_[require reagent.cookies :as cookies]
-            [lexy.client :as client]))
+            [lexy.client :as client]
+            [lexy.message :refer [message-box]]))
 
 (def DEBUG false)
 
@@ -20,7 +21,7 @@
 (defonce app-state (reagent/atom {:active-file nil
                                   :batch-size 25
                                   :direction :fwd
-                                  :files []
+                                  :logged-in? false
                                   :login-showing? true}))
 
 (defonce default-panel-state {:slugs []
@@ -35,19 +36,19 @@
   (reset! def-panel-state default-panel-state))
 
 #_(defn file-list-handler [response]
-  (when DEBUG (print response))
-  (swap! app-state merge response))
+    (when DEBUG (print response))
+    (swap! app-state merge response))
 
 #_(defn populate-files
-  "add nemes of available files to the db"
-  [lang]
-  (let [handler file-list-handler
-        pattern (cond
-                  (= lang :de) "german"
-                  (= lang :it) "italian"
-                  (= lang :test) "test")]
-    (client/get-endpoint (str "/files/" pattern) handler))
-  (render-view picker-view))
+    "add nemes of available files to the db"
+    [lang]
+    (let [handler file-list-handler
+          pattern (cond
+                    (= lang :de) "german"
+                    (= lang :it) "italian"
+                    (= lang :test) "test")]
+      (client/get-endpoint (str "/files/" pattern) handler))
+    (render-view picker-view))
 
 (defn tagged-text
   "elt of info panel
@@ -116,39 +117,44 @@
     (if defs-loading?
       [:div [:span "Defs loading"]]
       ;; else not loading
-      (if slug
-        [:div.content.ml-2.mr-10
-         (word-box src)
-         (when def-showing?
-           (word-box target))
-         (when (and def-showing?
-                    (not= supp ""))
-           (word-box (:supp slug)))
-         [:div.field.is-grouped
-          (if (not def-showing?)
-            [:button.button.is-rounded.is-warning
-             {:on-click toggle-def-showing}
-             "ShowDef"]
-            [:div.field.is-grouped
-             [:button.button.is-rounded.is-success.ml-4
-              {:on-click right-action}
-              "Right"]
-             [:button.button.is-rounded.is-danger.ml-4
-              {:on-click wrong-action}
-              "Wrong"]])]
-         [:div.field.is-grouped
-          [:button.button.is-rounded.has-background-light.ml-2
-           {:on-click #(.open js/window
-                              (str "https://www.dict.cc/?s=" src)
-                              "_blank")}
-           "Lkup dict.cc"]
-          [:button.button.is-rounded.has-background-light.ml-4
-           {:on-click #(.open js/window
-                              (str glosbe-url src)
-                              "_blank")}
-           "Lkup Glosbe"]]]
+      (if (:logged-in? @app-state)
+        (do
+          (print "Def panel logged in")
+          (if slug
+            [:div.content.ml-2.mr-10
+             (word-box src)
+             (when def-showing?
+               (word-box target))
+             (when (and def-showing?
+                        (not= supp ""))
+               (word-box (:supp slug)))
+             [:div.field.is-grouped
+              (if (not def-showing?)
+                [:button.button.is-rounded.is-warning
+                 {:on-click toggle-def-showing}
+                 "ShowDef"]
+                [:div.field.is-grouped
+                 [:button.button.is-rounded.is-success.ml-4
+                  {:on-click right-action}
+                  "Right"]
+                 [:button.button.is-rounded.is-danger.ml-4
+                  {:on-click wrong-action}
+                  "Wrong"]])]
+             [:div.field.is-grouped
+              [:button.button.is-rounded.has-background-light.ml-2
+               {:on-click #(.open js/window
+                                  (str "https://www.dict.cc/?s=" src)
+                                  "_blank")}
+               "Lkup dict.cc"]
+              [:button.button.is-rounded.has-background-light.ml-4
+               {:on-click #(.open js/window
+                                  (str glosbe-url src)
+                                  "_blank")}
+               "Lkup Glosbe"]]]
         ;; else if slug is nil
-        [:div [:span "Batch complete"]]))))
+            [:div [:span "Batch complete"]]))
+;; not logged in
+        [:div "not logged in"]))))
 
 (defn id->value
   "get value of element with specified id"
@@ -165,7 +171,9 @@
   (if (= (:login response) "rejected")
     (do (print "bad login")
         (set-active-file nil))
-    (print "good login")))
+    (do
+      (swap! app-state merge {:logged-in? true})
+      (print "good login"))))
 
 (defn submit-login
   "gather values from login box and submit to server"
@@ -190,7 +198,7 @@
        [:div.modal-card
         [:header.modal-card-head
          [:p.modal-card-title "Lexy Login"]]
-        [:section.modal-card-body 
+        [:section.modal-card-body
          [:div.field
           [:label.label "Username"]
           [:div.control
@@ -206,9 +214,8 @@
             [:select#lang
              [:option "German"]
              [:option "Italian"]
-             [:option "Test"]]]]
-          ]]
-        
+             [:option "Test"]]]]]]
+
         [:footer.modal-card-foot
          [:button.button.is-success
           {:on-click submit-login} "Login"]
@@ -232,16 +239,16 @@
      [:span {:aria-hidden "true"}]
      [:span {:aria-hidden "true"}]]]
    #_[:div.navbar-menu
-    [:div.navbar-start
-     [:a.navbar-item {:href "#"
-                      :on-click #(populate-files :de)}
-      "German"]
-     [:a.navbar-item {:href "#"
-                      :on-click #(populate-files :it)}
-      "Italian"]
-     [:a.navbar-item {:href "#"
-                      :on-click #(populate-files :test)}
-      "Test"]]]])
+      [:div.navbar-start
+       [:a.navbar-item {:href "#"
+                        :on-click #(populate-files :de)}
+        "German"]
+       [:a.navbar-item {:href "#"
+                        :on-click #(populate-files :it)}
+        "Italian"]
+       [:a.navbar-item {:href "#"
+                        :on-click #(populate-files :test)}
+        "Test"]]]])
 
 (defn slug-handler
   "set slugs in def-panel-state"
@@ -266,7 +273,7 @@
   (print "set-active-file done")
   (render-view def-view))
 
-(defn make-filemenu-entry
+#_(defn make-filemenu-entry
   "helper to create file table row"
   [fname]
   [:tr [:th ^{:key fname}
@@ -274,12 +281,12 @@
          :on-click #(set-active-file (-> % .-target .-id))}
         fname]])
 
-(defn make-filemenu-body
+#_(defn make-filemenu-body
   "helper to create file table body"
   [files]
   (into [:tbody] (map make-filemenu-entry files)))
 
-(defn file-picker
+#_(defn file-picker
   "view for choosing files"
   []
   (let [files (:files @app-state)]
@@ -308,7 +315,7 @@
    [menu]
    [info-panel]])
 
-(defn picker-view
+#_(defn picker-view
   "view with file-picker showing"
   []
   [:div#top
@@ -324,6 +331,17 @@
    [menu]
    [info-panel]
    [def-panel def-panel-state]])
+
+(defn msg-dismiss-action
+  "what to do when message dissmissed"
+  []
+  (print "msg-dismiss-action")
+  nil)
+
+(defn message-view
+  "display modal message box"
+  [text]
+  (message-box text true msg-dismiss-action))
 
 (defn render-view
   "render a defined view"
@@ -352,7 +370,7 @@
 (comment
   @app-state
   (. js/document -location)
-  (make-filemenu-body (:files @app-state))
+  #_(make-filemenu-body (:files @app-state))
   (.open js/window "https://www.dict.cc/?s=schalten", "_blank"))
 
 ;; https://stackoverflow.com/questions/42142239/how-to-create-a-appendchild-reagent-element))
