@@ -19,7 +19,7 @@
 ;; define your app data so that it doesn't get over-written on reload
 
 (defonce app-state (reagent/atom {:active-file nil
-                                  :batch-size 25
+                                  :batch-size 50
                                   :direction :fwd
                                   :logged-in? false
                                   :message-showing? false
@@ -211,6 +211,7 @@
     (do (print "bad login")
         (set-active-file nil))
     (do
+      #_(set-login-showing true)
       (swap! app-state merge {:logged-in? true})
       (print "good login"))))
 
@@ -313,18 +314,31 @@
 
 (defn message-view
   "display modal message box"
-  [text]
-  (message-box text true msg-dismiss-action))
+  []
+  (let [text (:message-text @app-state)]
+    (message-box text true msg-dismiss-action)))
 
 (defn render-view
   "render a defined view"
   [view]
   (rdom/render view (. js/document (getElementById "app"))))
 
+(defn master-view
+  []
+  (print "master view called")
+  (let [{:keys [message-showing? logged-in?]} @app-state]
+    
+    (if (not logged-in?)
+      [login-box]
+      (if message-showing?
+        [message-view]
+        [def-view]))))
+
 (defn start
   "render the initial view"
   []
-  (render-view (start-panel)))
+  #_(render-view (start-panel))
+  (render-view (master-view)))
 
 (defn ^:export init []
   ;; init is called ONCE when the page loads
