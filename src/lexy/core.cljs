@@ -22,6 +22,7 @@
                                   :batch-size 25
                                   :direction :fwd
                                   :logged-in? false
+                                  :message-showing? false
                                   :login-showing? true}))
 
 (defonce default-panel-state {:slugs []
@@ -34,21 +35,6 @@
 
 (defn reset-def-panel! []
   (reset! def-panel-state default-panel-state))
-
-#_(defn file-list-handler [response]
-    (when DEBUG (print response))
-    (swap! app-state merge response))
-
-#_(defn populate-files
-    "add nemes of available files to the db"
-    [lang]
-    (let [handler file-list-handler
-          pattern (cond
-                    (= lang :de) "german"
-                    (= lang :it) "italian"
-                    (= lang :test) "test")]
-      (client/get-endpoint (str "/files/" pattern) handler))
-    (render-view picker-view))
 
 (defn tagged-text
   "elt of info panel
@@ -179,7 +165,7 @@
   "gather values from login box and submit to server"
   []
   (let [[un pw lang] (mapv id->value ["un" "pw" "lang"])]
-    (print un pw lang)
+    #_(print un pw lang)
     (set-active-file lang)
     (client/login {:username un
                    :password pw
@@ -273,35 +259,6 @@
   (print "set-active-file done")
   (render-view def-view))
 
-#_(defn make-filemenu-entry
-  "helper to create file table row"
-  [fname]
-  [:tr [:th ^{:key fname}
-        {:id fname
-         :on-click #(set-active-file (-> % .-target .-id))}
-        fname]])
-
-#_(defn make-filemenu-body
-  "helper to create file table body"
-  [files]
-  (into [:tbody] (map make-filemenu-entry files)))
-
-#_(defn file-picker
-  "view for choosing files"
-  []
-  (let [files (:files @app-state)]
-    [:div#picker.columns.mt-2
-     [:div.column.is-1]
-     [:div.column.is-3
-      [:table-container
-       [:div.content
-        [:table.table.is-bordered.is-hoverable
-         [:thead
-          [:tr
-           [:th.has-text-info
-            "File Name"]]]
-         (make-filemenu-body files)]]]]]))
-
 (defn have-active-file?
   "has active file been set in app-state?"
   []
@@ -314,15 +271,6 @@
    [login-box]
    [menu]
    [info-panel]])
-
-#_(defn picker-view
-  "view with file-picker showing"
-  []
-  [:div#top
-   [menu]
-   [info-panel]
-   [:div#picker
-    [file-picker]]])
 
 (defn def-view
   "view with defs and associatedbuttons"
@@ -377,3 +325,56 @@
 
 ;; NEXT STEPS implement batch size, display counts. deal with fwd and bkwd
 ;; 
+;; 
+#_(defn make-filemenu-entry
+    "helper to create file table row"
+    [fname]
+    [:tr [:th ^{:key fname}
+          {:id fname
+           :on-click #(set-active-file (-> % .-target .-id))}
+          fname]])
+
+#_(defn make-filemenu-body
+    "helper to create file table body"
+    [files]
+    (into [:tbody] (map make-filemenu-entry files)))
+
+#_(defn file-picker
+    "view for choosing files"
+    []
+    (let [files (:files @app-state)]
+      [:div#picker.columns.mt-2
+       [:div.column.is-1]
+       [:div.column.is-3
+        [:table-container
+         [:div.content
+          [:table.table.is-bordered.is-hoverable
+           [:thead
+            [:tr
+             [:th.has-text-info
+              "File Name"]]]
+           (make-filemenu-body files)]]]]]))
+
+#_(defn picker-view
+    "view with file-picker showing"
+    []
+    [:div#top
+     [menu]
+     [info-panel]
+     [:div#picker
+      [file-picker]]])
+
+#_(defn file-list-handler [response]
+    (when DEBUG (print response))
+    (swap! app-state merge response))
+
+#_(defn populate-files
+    "add nemes of available files to the db"
+    [lang]
+    (let [handler file-list-handler
+          pattern (cond
+                    (= lang :de) "german"
+                    (= lang :it) "italian"
+                    (= lang :test) "test")]
+      (client/get-endpoint (str "/files/" pattern) handler))
+    (render-view picker-view))
