@@ -257,7 +257,7 @@
   #_(client/set-db fname)
   (client/get-endpoint (str "/fetch") slug-handler)
   (print "set-active-file done")
-  (render-view def-view))
+  (render-view (def-view)))
 
 (defn have-active-file?
   "has active file been set in app-state?"
@@ -294,12 +294,12 @@
 (defn render-view
   "render a defined view"
   [view]
-  (rdom/render (view) (. js/document (getElementById "app"))))
+  (rdom/render view (. js/document (getElementById "app"))))
 
 (defn start
   "render the initial view"
   []
-  (render-view start-panel))
+  (render-view (start-panel)))
 
 (defn ^:export init []
   ;; init is called ONCE when the page loads
