@@ -9,7 +9,7 @@
 (def DEBUG false)
 
 ;; forward defs
-(declare picker-view)
+#_(declare picker-view)
 (declare render-view)
 (declare def-view)
 
@@ -23,6 +23,7 @@
                                   :direction :fwd
                                   :logged-in? false
                                   :message-showing? false
+                                  :message-text ""
                                   :login-showing? true}))
 
 (defonce default-panel-state {:slugs []
@@ -33,8 +34,65 @@
 
 (def def-panel-state (reagent/atom default-panel-state))
 
+;; state helper fns
+;; ----------------
+
+(defn set-message-flag-and-text
+ "set message-showing? flag in app-state, with text if needed"
+ ([t-or-f]
+  (set-message-flag-and-text t-or-f ""))
+  ([t-or-f text]
+   (swap! app-state merge {:message-showing? t-or-f
+                           :message-text text})))
+
+(defn set-login-showing
+  "set login-showing? flag in app-state"
+  [t-or-f]
+  (swap! app-state assoc :login-showing? t-or-f))
+
+(defn close-login-box
+  "set :login-showing? flag to false"
+  []
+  (swap! app-state assoc :login-showing? false))
+
 (defn reset-def-panel! []
   (reset! def-panel-state default-panel-state))
+
+(defn toggle-def-showing
+  "Toggle def-showing? in def-panel-state"
+  []
+  (swap! def-panel-state update-in [:def-showing?] not))
+
+(defn slug-handler
+  "set slugs in def-panel-state"
+  [response]
+  (when DEBUG (print "slug-handler: resp: " response))
+  (let [slugs (mapv #(apply ->Slug %) (:slugs response))
+        response1 (merge response {:slugs slugs})
+        new-state (merge response1 {:cursor 0
+                                    :defs-loading? false
+                                    :def-showing? false})]
+    (when DEBUG
+      (print "slug-handler: 2slugs: " (take 2 slugs))
+      (print "loading: " (:defs-loading? new-state)))
+    (swap! def-panel-state merge new-state)))
+
+(defn set-active-file
+  "set active file name in app-state"
+  [fname]
+  (swap! app-state assoc-in [:active-file] fname)
+  #_(client/set-db fname)
+  (client/get-endpoint (str "/fetch") slug-handler)
+  (print "set-active-file done")
+  (render-view (def-view)))
+
+(defn have-active-file?
+  "has active file been set in app-state?"
+  []
+  (not (nil? (:active-file @app-state))))
+
+;; view fns
+;; --------
 
 (defn tagged-text
   "elt of info panel
@@ -60,11 +118,6 @@
   [myword]
   [:div.defholder.my-3.has-background-white-ter.mr-6
    [:span.tag.is-size-4.dark myword]])
-
-(defn toggle-def-showing
-  "Toggle def-showing? in def-panel-state"
-  []
-  (swap! def-panel-state update-in [:def-showing?] not))
 
 (defn bump-cursor
   "bump cursor on slugs list in def-panel-state"
@@ -175,9 +228,7 @@
 (defn login-box
   "login element"
   []
-  (let [login-showing? (:login-showing? @app-state)
-        close-login-box #(swap! app-state assoc :login-showing?
-                                false)]
+  (let [login-showing? (:login-showing? @app-state)]
     (when login-showing?
       [:div.modal.is-active
        [:div.modal-background.has-background-light-gray]
@@ -236,33 +287,7 @@
                         :on-click #(populate-files :test)}
         "Test"]]]])
 
-(defn slug-handler
-  "set slugs in def-panel-state"
-  [response]
-  (when DEBUG (print "slug-handler: resp: " response))
-  (let [slugs (mapv #(apply ->Slug %) (:slugs response))
-        response1 (merge response {:slugs slugs})
-        new-state (merge response1 {:cursor 0
-                                    :defs-loading? false
-                                    :def-showing? false})]
-    (when DEBUG
-      (print "slug-handler: 2slugs: " (take 2 slugs))
-      (print "loading: " (:defs-loading? new-state)))
-    (swap! def-panel-state merge new-state)))
 
-(defn set-active-file
-  "set active file name in app-state"
-  [fname]
-  (swap! app-state assoc-in [:active-file] fname)
-  #_(client/set-db fname)
-  (client/get-endpoint (str "/fetch") slug-handler)
-  (print "set-active-file done")
-  (render-view (def-view)))
-
-(defn have-active-file?
-  "has active file been set in app-state?"
-  []
-  (not (nil? (:active-file @app-state))))
 
 (defn start-panel
   "initial view before active file chosen"
