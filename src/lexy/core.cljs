@@ -46,12 +46,12 @@
    (swap! app-state merge {:message-showing? t-or-f
                            :message-text text})))
 
-(defn set-login-showing
+(defn set-login-showing!
   "set login-showing? flag in app-state"
   [t-or-f]
   (swap! app-state assoc :login-showing? t-or-f))
 
-(defn close-login-box
+(defn close-login-box!
   "set :login-showing? flag to false"
   []
   (swap! app-state assoc :login-showing? false))
@@ -59,10 +59,10 @@
 (defn reset-def-panel! []
   (reset! def-panel-state default-panel-state))
 
-(defn toggle-def-showing
-  "Toggle def-showing? in def-panel-state"
-  []
-  (swap! def-panel-state update-in [:def-showing?] not))
+(defn set-def-showing!
+  "set def-showing? in def-panel-state"
+  [t-or-f]
+  (swap! def-panel-state assoc :def-showing? t-or-f))
 
 (defn slug-handler
   "set slugs in def-panel-state"
@@ -128,14 +128,14 @@
 (defn right-action
   "on clicking right button"
   []
-  (toggle-def-showing)
+  (set-def-showing! false)
   (swap! def-panel-state assoc :dir (rand-int 2))
   (bump-cursor))
 
 (defn wrong-action
   "on clicking wrong button"
   []
-  (toggle-def-showing)
+  (set-def-showing! false)
   (swap! def-panel-state assoc :dir (rand-int 2))
   (bump-cursor))
 
@@ -148,6 +148,7 @@
         [src, target, supp] (if (= dir 0)
                               ((juxt :src :target :supp) slug)
                               ((juxt :target :src :supp) slug))
+        logged-in? [:logged-in? @app-state]
         glosbe-url (if (= dir 0)
                      "https://glosbe.com/de/en/"
                      "https://glosbe.com/en/de/")]
@@ -157,44 +158,44 @@
     (if defs-loading?
       [:div [:span "Defs loading"]]
       ;; else not loading
-      (if (:logged-in? @app-state)
-        (do
-          (print "Def panel logged in")
-          (if slug
-            [:div.content.ml-2.mr-10
-             (word-box src)
-             (when def-showing?
-               (word-box target))
-             (when (and def-showing?
-                        (not= supp ""))
-               (word-box (:supp slug)))
-             [:div.field.is-grouped
-              (if (not def-showing?)
-                [:button.button.is-rounded.is-warning
-                 {:on-click toggle-def-showing}
-                 "ShowDef"]
-                [:div.field.is-grouped
-                 [:button.button.is-rounded.is-success.ml-4
-                  {:on-click right-action}
-                  "Right"]
-                 [:button.button.is-rounded.is-danger.ml-4
-                  {:on-click wrong-action}
-                  "Wrong"]])]
-             [:div.field.is-grouped
-              [:button.button.is-rounded.has-background-light.ml-2
-               {:on-click #(.open js/window
-                                  (str "https://www.dict.cc/?s=" src)
-                                  "_blank")}
-               "Lkup dict.cc"]
-              [:button.button.is-rounded.has-background-light.ml-4
-               {:on-click #(.open js/window
-                                  (str glosbe-url src)
-                                  "_blank")}
-               "Lkup Glosbe"]]]
+      (if logged-in?
+          (do
+            (print "Def panel logged in")
+            (if slug
+              [:div.content.ml-2.mr-10
+               (word-box src)
+               (when def-showing?
+                 (word-box target))
+               (when (and def-showing?
+                          (not= supp ""))
+                 (word-box (:supp slug)))
+               [:div.field.is-grouped
+                (if (not def-showing?)
+                  [:button.button.is-rounded.is-warning
+                   {:on-click #(set-def-showing! true)}
+                   "ShowDef"]
+                  [:div.field.is-grouped
+                   [:button.button.is-rounded.is-success.ml-4
+                    {:on-click right-action}
+                    "Right"]
+                   [:button.button.is-rounded.is-danger.ml-4
+                    {:on-click wrong-action}
+                    "Wrong"]])]
+               [:div.field.is-grouped
+                [:button.button.is-rounded.has-background-light.ml-2
+                 {:on-click #(.open js/window
+                                    (str "https://www.dict.cc/?s=" src)
+                                    "_blank")}
+                 "Lkup dict.cc"]
+                [:button.button.is-rounded.has-background-light.ml-4
+                 {:on-click #(.open js/window
+                                    (str glosbe-url src)
+                                    "_blank")}
+                 "Lkup Glosbe"]]]
         ;; else if slug is nil
-            [:div [:span "Batch complete"]]))
+              [:div [:span "Batch complete"]]))
 ;; not logged in
-        [:div "not logged in"]))))
+          [:div "not logged in"]))))
 
 (defn id->value
   "get value of element with specified id"
@@ -208,16 +209,15 @@
   "handle response from the login endpoint"
   [response]
   (print "login-handler: " response)
-  (close-login-box)
   (if (= (:login response) "rejected")
     (do (print "bad login")
         (set-active-file nil)
         (set-message-flag-and-text true "Bad Login"))
     (do
-      (close-login-box)
       (swap! app-state merge {:logged-in? true})
-      (toggle-def-showing)
+      (set-def-showing! false)
       (print "good login")))
+  (close-login-box!)
   (master-view))
 
 (defn submit-login
@@ -263,7 +263,7 @@
          [:button.button.is-success
           {:on-click submit-login} "Login"]
          [:button.button
-          {:on-click close-login-box} "Cancel"]]]])))
+          {:on-click close-login-box!} "Cancel"]]]])))
 
 (defn menu
   "fixed menu view"
@@ -341,6 +341,7 @@
 (defn start
   "render the initial view"
   []
+  (reset-def-panel!)
   #_(render-view (start-panel))
   (master-view))
 
