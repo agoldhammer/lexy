@@ -12,6 +12,7 @@
 #_(declare picker-view)
 (declare render-view)
 (declare def-view)
+(declare master-view)
 
 ;; for development
 (defrecord Slug [rowid src target supp lrd-from lrd-to nseen])
@@ -84,7 +85,7 @@
   #_(client/set-db fname)
   (client/get-endpoint (str "/fetch") slug-handler)
   (print "set-active-file done")
-  (render-view (def-view)))
+  (master-view))
 
 (defn have-active-file?
   "has active file been set in app-state?"
@@ -207,13 +208,17 @@
   "handle response from the login endpoint"
   [response]
   (print "login-handler: " response)
+  (close-login-box)
   (if (= (:login response) "rejected")
     (do (print "bad login")
-        (set-active-file nil))
+        (set-active-file nil)
+        (set-message-flag-and-text true "Bad Login"))
     (do
-      #_(set-login-showing true)
+      (close-login-box)
       (swap! app-state merge {:logged-in? true})
-      (print "good login"))))
+      (toggle-def-showing)
+      (print "good login")))
+  (master-view))
 
 (defn submit-login
   "gather values from login box and submit to server"
@@ -288,9 +293,7 @@
                         :on-click #(populate-files :test)}
         "Test"]]]])
 
-
-
-(defn start-panel
+#_(defn start-panel
   "initial view before active file chosen"
   []
   [:div
@@ -304,8 +307,9 @@
   [:div#top
    [menu]
    [info-panel]
-   [def-panel def-panel-state]])
+   [def-panel]])
 
+;; TODO: should vary with type of message, now does nothing
 (defn msg-dismiss-action
   "what to do when message dissmissed"
   []
@@ -328,17 +332,17 @@
   (print "master view called")
   (let [{:keys [message-showing? logged-in?]} @app-state]
     
-    (if (not logged-in?)
-      [login-box]
-      (if message-showing?
-        [message-view]
-        [def-view]))))
+    (if message-showing?
+      (render-view (message-view))
+      (if (not logged-in?)
+        (render-view (login-box))
+        (render-view (def-view))))))
 
 (defn start
   "render the initial view"
   []
   #_(render-view (start-panel))
-  (render-view (master-view)))
+  (master-view))
 
 (defn ^:export init []
   ;; init is called ONCE when the page loads
@@ -358,6 +362,10 @@
   @app-state
   (. js/document -location)
   #_(make-filemenu-body (:files @app-state))
+  (:defs-loading? @def-panel-state)
+  (:def-showing? @def-panel-state)
+  (master-view)
+  (render-view (def-view))
   (.open js/window "https://www.dict.cc/?s=schalten", "_blank"))
 
 ;; https://stackoverflow.com/questions/42142239/how-to-create-a-appendchild-reagent-element))
