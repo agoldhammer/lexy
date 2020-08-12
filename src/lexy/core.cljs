@@ -13,6 +13,7 @@
 (declare render-view)
 (declare def-view)
 (declare master-view)
+(declare stop)
 
 ;; for development
 (defrecord Slug [rowid src target supp lrd-from lrd-to nseen])
@@ -193,7 +194,13 @@
                                     "_blank")}
                  "Lkup Glosbe"]]]
         ;; else if slug is nil
-              [:div [:span "Batch complete"]]))
+              [:div [:button.button.is-rounded.is-success.ml-4
+                     {:on-click #(set-active-file (:active-file @app-state))}
+                     "Done, fetch more"]
+               ;; TODO: add logout endpoint
+               [:button.button.is-rounded.is-danger.ml-4
+                {:on-click stop}
+                "Logout"]]))
 ;; not logged in
           [:div "not logged in"]))))
 
