@@ -52,6 +52,12 @@
   [t-or-f]
   (swap! app-state assoc :login-showing? t-or-f))
 
+(defn previous-word!
+  "set cursor back 1"
+  []
+  (let [cur (:cursor @def-panel-state)]
+    (swap! def-panel-state assoc-in [:cursor] (max 0 (dec cur)))))
+
 (defn close-login-box!
   "set :login-showing? flag to false"
   []
@@ -68,7 +74,7 @@
 (defn slug-handler
   "set slugs in def-panel-state"
   [response]
-  (when DEBUG (print "slug-handler: resp: " response))
+  #_(when DEBUG (print "slug-handler: resp: " response))
   (let [slugs (mapv #(apply ->Slug %) (:slugs response))
         response1 (merge response {:slugs slugs})
         new-state (merge response1 {:cursor 0
@@ -77,6 +83,12 @@
     (when DEBUG
       (print "slug-handler: 2slugs: " (take 2 slugs))
       (print "loading: " (:defs-loading? new-state)))
+    ;; clear out any slugs remaining from previous log
+    #_(print "slughandler: before: " (take 2 (:slugs def-panel-state)))
+    (swap! def-panel-state assoc :slugs [])
+    (when DEBUG 
+      (print "d-p-s slugs: shd be empty: " (take 2 (:slugs def-panel-state)))
+      (print "new state" (take 2 (:slugs new-state))))
     (swap! def-panel-state merge new-state)))
 
 (defn set-active-file
@@ -172,9 +184,13 @@
                  (word-box (:supp slug)))
                [:div.field.is-grouped
                 (if (not def-showing?)
-                  [:button.button.is-rounded.is-warning
-                   {:on-click #(set-def-showing! true)}
-                   "ShowDef"]
+                  [:div.field.is-grouped
+                   [:button.button.is-rounded.is-warning
+                    {:on-click #(set-def-showing! true)}
+                    "ShowDef"]
+                   [:button.button.is-rounded.is-danger.ml-4
+                    {:on-click previous-word!}
+                    "Previous word"]]
                   [:div.field.is-grouped
                    [:button.button.is-rounded.is-success.ml-4
                     {:on-click right-action}
@@ -199,7 +215,7 @@
                      "Done, fetch more"]
                ;; TODO: add logout endpoint
                [:button.button.is-rounded.is-danger.ml-4
-                {:on-click stop}
+                {:on-click #(.open js/window "/")}
                 "Logout"]]))
 ;; not logged in
           [:div "not logged in"]))))
@@ -221,6 +237,7 @@
         (set-active-file nil)
         (set-message-flag-and-text true "Bad Login"))
     (do
+      (set-active-file (:active-db response))
       (swap! app-state merge {:logged-in? true})
       (set-def-showing! false)
       (print "good login")))
@@ -232,7 +249,7 @@
   []
   (let [[un pw lang] (mapv id->value ["un" "pw" "lang"])]
     #_(print un pw lang)
-    (set-active-file lang)
+    #_(set-active-file lang)
     (client/login {:username un
                    :password pw
                    :lang lang}
