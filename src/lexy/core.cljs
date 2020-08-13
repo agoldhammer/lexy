@@ -133,8 +133,9 @@
 (defn word-box
   "element for displaying word def, and supplement"
   [myword]
-  [:div.defholder.my-3.has-background-white-ter.mr-6
-   [:span.tag.is-size-4.dark myword]])
+  [:div.control.my-3.ml-4.mr-6
+   [:textarea.is-large.mx-2.is-size-4.has-fixed-size {:value myword
+                              :on-change #()}]])
 
 (defn bump-cursor
   "bump cursor on slugs list in def-panel-state"
@@ -222,7 +223,7 @@
           (do
             (print "Def panel logged in")
             (if slug
-              [:div.content.ml-2.mr-10
+              [:div.field.ml-2.mr-10
                (word-box src)
                (when def-showing?
                  (word-box target))
