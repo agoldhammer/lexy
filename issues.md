@@ -7,3 +7,4 @@
 5. allow editing of entries
 6. rework or remove pysimplegui interface
 7. change lookups by language
+8. Implement per user tables

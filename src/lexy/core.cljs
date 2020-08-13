@@ -134,8 +134,10 @@
   "element for displaying word def, and supplement"
   [myword]
   [:div.control.my-3.ml-4.mr-6
-   [:textarea.is-large.mx-2.is-size-4.has-fixed-size {:value myword
-                              :on-change #()}]])
+   [:input.input.is-medium.is-primary.mx-2.is-size-4
+      {:value myword
+       :type "text"
+       :on-change #()}]])
 
 (defn bump-cursor
   "bump cursor on slugs list in def-panel-state"
@@ -302,7 +304,7 @@
                              :placeholder "username"}]]
           [:label.label "Password"]
           [:div.control
-           [:input#pw.input {:type "text"
+           [:input#pw.input {:type "password"
                              :placeholder "password"}]]
           [:label.label "Language"]
           [:div.select
