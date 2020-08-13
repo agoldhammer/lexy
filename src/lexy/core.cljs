@@ -21,6 +21,7 @@
 ;; define your app data so that it doesn't get over-written on reload
 
 (defonce app-state (reagent/atom {:active-file nil
+                                  :total 0
                                   :batch-size 50
                                   :direction :fwd
                                   :logged-in? false
@@ -121,11 +122,13 @@
   []
   (let [{:keys [active-file
                 batch-size
-                direction]} @app-state]
+                direction
+                total]} @app-state]
     [:div-level.is-size-7.is-italic.has-text-info
      (tagged-text "Active file" active-file)
      (tagged-text "Batch size" batch-size)
-     (tagged-text "Dir" (name direction))]))
+     (tagged-text "Dir" (name direction))
+     (tagged-text "Lexicon size" total)]))
 
 (defn word-box
   "element for displaying word def, and supplement"
@@ -152,11 +155,55 @@
   (swap! def-panel-state assoc :dir (rand-int 2))
   (bump-cursor))
 
+(defn show-def-button []
+  [:button.button.is-rounded.is-warning
+   {:on-click #(set-def-showing! true)}
+   "ShowDef"])
+
+(defn previous-word-button []
+  [:button.button.is-rounded.is-danger.ml-4
+   {:on-click previous-word!}
+   "Previous word"])
+
+(defn right-button []
+  [:button.button.is-rounded.is-success.ml-4
+   {:on-click right-action}
+   "Right"])
+
+(defn wrong-button []
+  [:button.button.is-rounded.is-danger.ml-4
+   {:on-click wrong-action}
+   "Wrong"])
+
+(defn open-dictcc-button [src]
+  [:button.button.is-rounded.has-background-light.ml-2
+   {:on-click #(.open js/window
+                      (str "https://www.dict.cc/?s=" src)
+                      "_blank")}
+   "Lkup dict.cc"])
+
+(defn open-glosbe-button [src glosbe-url]
+  [:button.button.is-rounded.has-background-light.ml-4
+   {:on-click #(.open js/window
+                      (str glosbe-url src)
+                      "_blank")}
+   "Lkup Glosbe"])
+
+(defn fetch-more-button []
+  [:button.button.is-rounded.is-success.ml-4
+   {:on-click #(set-active-file (:active-file @app-state))}
+   "Done, fetch more"])
+
+;; TODO: add logout endpoint
+(defn logout-button []
+  [:button.button.is-rounded.is-danger.ml-4
+   {:on-click #(.open js/window "/")}
+   "Logout"])
+
 (defn def-panel
   "view with word and defs; choose dir randomly"
   []
-  (let [{:keys [slugs dir cursor def-showing? defs-loading?]}
-        @def-panel-state
+  (let [{:keys [slugs dir cursor def-showing? defs-loading?]} @def-panel-state
         slug (nth slugs cursor nil)
         [src, target, supp] (if (= dir 0)
                               ((juxt :src :target :supp) slug)
@@ -185,38 +232,18 @@
                [:div.field.is-grouped
                 (if (not def-showing?)
                   [:div.field.is-grouped
-                   [:button.button.is-rounded.is-warning
-                    {:on-click #(set-def-showing! true)}
-                    "ShowDef"]
-                   [:button.button.is-rounded.is-danger.ml-4
-                    {:on-click previous-word!}
-                    "Previous word"]]
+                   (show-def-button)
+                   (previous-word-button)]
                   [:div.field.is-grouped
-                   [:button.button.is-rounded.is-success.ml-4
-                    {:on-click right-action}
-                    "Right"]
-                   [:button.button.is-rounded.is-danger.ml-4
-                    {:on-click wrong-action}
-                    "Wrong"]])]
-               [:div.field.is-grouped
-                [:button.button.is-rounded.has-background-light.ml-2
-                 {:on-click #(.open js/window
-                                    (str "https://www.dict.cc/?s=" src)
-                                    "_blank")}
-                 "Lkup dict.cc"]
-                [:button.button.is-rounded.has-background-light.ml-4
-                 {:on-click #(.open js/window
-                                    (str glosbe-url src)
-                                    "_blank")}
-                 "Lkup Glosbe"]]]
+                   (right-button)
+                   (wrong-button)])]
+               [:div.field.is-grouped  ;; else def-showing? is false
+                (open-dictcc-button src)
+                (open-glosbe-button src glosbe-url)]]
         ;; else if slug is nil
-              [:div [:button.button.is-rounded.is-success.ml-4
-                     {:on-click #(set-active-file (:active-file @app-state))}
-                     "Done, fetch more"]
-               ;; TODO: add logout endpoint
-               [:button.button.is-rounded.is-danger.ml-4
-                {:on-click #(.open js/window "/")}
-                "Logout"]]))
+              [:div 
+               (fetch-more-button)
+               (logout-button)]))
 ;; not logged in
           [:div "not logged in"]))))
 
@@ -238,7 +265,8 @@
         (set-message-flag-and-text true "Bad Login"))
     (do
       (set-active-file (:active-db response))
-      (swap! app-state merge {:logged-in? true})
+      (swap! app-state merge {:logged-in? true
+                              :total (:total response)})
       (set-def-showing! false)
       (print "good login")))
   (close-login-box!)
