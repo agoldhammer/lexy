@@ -59,10 +59,12 @@
   (let [cur (:cursor @def-panel-state)]
     (swap! def-panel-state assoc-in [:cursor] (max 0 (dec cur)))))
 
+;; TODO: add a login failed element
 (defn close-login-box!
   "set :login-showing? flag to false"
   []
-  (swap! app-state assoc :login-showing? false))
+  (swap! app-state assoc :login-showing? false)
+  #(.open js/window "/"))
 
 (defn reset-def-panel! []
   (reset! def-panel-state default-panel-state))

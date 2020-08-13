@@ -8,3 +8,4 @@
 6. rework or remove pysimplegui interface
 7. change lookups by language
 8. Implement per user tables
+9. add login failed element to be called by close-login-box!
