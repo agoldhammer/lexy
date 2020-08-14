@@ -4,7 +4,8 @@
             #_[reagent.session :as session]
             #_[require reagent.cookies :as cookies]
             [lexy.client :as client]
-            [lexy.message :refer [message-box]]))
+            [lexy.message :refer [message-box]]
+            [lexy.cmpts :refer [lkup-button]]))
 
 (def DEBUG false)
 
@@ -210,13 +211,13 @@
   []
   (let [{:keys [slugs dir cursor def-showing? defs-loading?]} @def-panel-state
         slug (nth slugs cursor nil)
+        ;; unflipped src0 and target0 go to buttons
+        [src0, target0] ((juxt :src :target) slug)
         [src, target, supp] (if (= dir 0)
                               ((juxt :src :target :supp) slug)
                               ((juxt :target :src :supp) slug))
         logged-in? [:logged-in? @app-state]
-        glosbe-url (if (= dir 0)
-                     "https://glosbe.com/de/en/"
-                     "https://glosbe.com/en/de/")]
+        lang (:active-file @app-state)]
     (when DEBUG
       (print "def-panel: " defs-loading? slug cursor
              (first slugs)))
@@ -242,9 +243,16 @@
                   [:div.field.is-grouped
                    (right-button)
                    (wrong-button)])]
-               [:div.field.is-grouped  ;; else def-showing? is false
-                (open-dictcc-button src)
-                (open-glosbe-button src glosbe-url)]]
+               (when def-showing?
+                 [:div.field.is-grouped  ;; else def-showing? is false
+                  ;; when lang is "italian", :other = :reit
+                  ;; when lang is "german", :other = :glosbe
+                  (when (not= lang "italian")
+                    (list 
+                     (lkup-button src0 lang :dict-cc :fwd)
+                     (lkup-button target0 lang :dict-cc :rev)))
+                  (lkup-button src0 lang :other :fwd)
+                  (lkup-button target0 lang :other :rev)])]
         ;; else if slug is nil
               [:div 
                (fetch-more-button)
