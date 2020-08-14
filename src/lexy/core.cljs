@@ -4,7 +4,8 @@
             #_[reagent.session :as session]
             #_[require reagent.cookies :as cookies]
             [lexy.client :as client]
-            [lexy.message :refer [message-box]]))
+            [lexy.message :refer [message-box]]
+            [lexy.cmpts :refer [lkup-button]]))
 
 (def DEBUG false)
 
@@ -59,10 +60,12 @@
   (let [cur (:cursor @def-panel-state)]
     (swap! def-panel-state assoc-in [:cursor] (max 0 (dec cur)))))
 
+;; TODO: add a login failed element
 (defn close-login-box!
   "set :login-showing? flag to false"
   []
-  (swap! app-state assoc :login-showing? false))
+  (swap! app-state assoc :login-showing? false)
+  #(.open js/window "/"))
 
 (defn reset-def-panel! []
   (reset! def-panel-state default-panel-state))
@@ -134,8 +137,10 @@
   "element for displaying word def, and supplement"
   [myword]
   [:div.control.my-3.ml-4.mr-6
-   [:textarea.is-large.mx-2.is-size-4.has-fixed-size {:value myword
-                              :on-change #()}]])
+   [:input.input.is-medium.is-primary.mx-2.is-size-4
+      {:value myword
+       :type "text"
+       :on-change #()}]])
 
 (defn bump-cursor
   "bump cursor on slugs list in def-panel-state"
@@ -177,14 +182,14 @@
    "Wrong"])
 
 (defn open-dictcc-button [src]
-  [:button.button.is-rounded.has-background-light.ml-2
+  [:button.button.is-rounded.has-background-light.ml-2.is-small
    {:on-click #(.open js/window
                       (str "https://www.dict.cc/?s=" src)
                       "_blank")}
    "Lkup dict.cc"])
 
 (defn open-glosbe-button [src glosbe-url]
-  [:button.button.is-rounded.has-background-light.ml-4
+  [:button.button.is-rounded.has-background-light.ml-4.is-small
    {:on-click #(.open js/window
                       (str glosbe-url src)
                       "_blank")}
@@ -206,13 +211,13 @@
   []
   (let [{:keys [slugs dir cursor def-showing? defs-loading?]} @def-panel-state
         slug (nth slugs cursor nil)
+        ;; unflipped src0 and target0 go to buttons
+        [src0, target0] ((juxt :src :target) slug)
         [src, target, supp] (if (= dir 0)
                               ((juxt :src :target :supp) slug)
                               ((juxt :target :src :supp) slug))
         logged-in? [:logged-in? @app-state]
-        glosbe-url (if (= dir 0)
-                     "https://glosbe.com/de/en/"
-                     "https://glosbe.com/en/de/")]
+        lang (:active-file @app-state)]
     (when DEBUG
       (print "def-panel: " defs-loading? slug cursor
              (first slugs)))
@@ -238,9 +243,16 @@
                   [:div.field.is-grouped
                    (right-button)
                    (wrong-button)])]
-               [:div.field.is-grouped  ;; else def-showing? is false
-                (open-dictcc-button src)
-                (open-glosbe-button src glosbe-url)]]
+               (when def-showing?
+                 [:div.field.is-grouped  ;; else def-showing? is false
+                  ;; when lang is "italian", :other = :reit
+                  ;; when lang is "german", :other = :glosbe
+                  (when (not= lang "italian")
+                    (list 
+                     (lkup-button src0 lang :dict-cc :fwd)
+                     (lkup-button target0 lang :dict-cc :rev)))
+                  (lkup-button src0 lang :other :fwd)
+                  (lkup-button target0 lang :other :rev)])]
         ;; else if slug is nil
               [:div 
                (fetch-more-button)
@@ -302,7 +314,7 @@
                              :placeholder "username"}]]
           [:label.label "Password"]
           [:div.control
-           [:input#pw.input {:type "text"
+           [:input#pw.input {:type "password"
                              :placeholder "password"}]]
           [:label.label "Language"]
           [:div.select
