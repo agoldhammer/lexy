@@ -432,7 +432,9 @@
   (:def-showing? @def-panel-state)
   (master-view)
   (render-view (def-view))
-  (.open js/window "https://www.dict.cc/?s=schalten", "_blank"))
+  (.open js/window "https://www.dict.cc/?s=schalten", "_blank")
+  (defn example []
+    [:<> [:h1 "joe"] [:h2 "sent me"]]))
 
 ;; https://stackoverflow.com/questions/42142239/how-to-create-a-appendchild-reagent-element))
 
