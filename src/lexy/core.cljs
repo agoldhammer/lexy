@@ -181,14 +181,14 @@
    {:on-click wrong-action}
    "Wrong"])
 
-(defn open-dictcc-button [src]
+#_(defn open-dictcc-button [src]
   [:button.button.is-rounded.has-background-light.ml-2.is-small
    {:on-click #(.open js/window
                       (str "https://www.dict.cc/?s=" src)
                       "_blank")}
    "Lkup dict.cc"])
 
-(defn open-glosbe-button [src glosbe-url]
+#_(defn open-glosbe-button [src glosbe-url]
   [:button.button.is-rounded.has-background-light.ml-4.is-small
    {:on-click #(.open js/window
                       (str glosbe-url src)
