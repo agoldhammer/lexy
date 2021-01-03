@@ -4,6 +4,9 @@ package-lock.json
 /public/js/compiled
 /.calva
 yarn.lock
+/.lsp
+.clj-kondo/*
+
 
 
 
