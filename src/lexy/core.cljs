@@ -17,7 +17,7 @@
 ;; (declare stop)
 
 ;; for development
-#_{:clj-kondo/ignore [:unused-declaration]}
+#_:clj-kondo/ignore
 (defrecord Slug [rowid src target supp lrd-from lrd-to nseen])
 
 ;; define your app data so that it doesn't get over-written on reload
@@ -417,6 +417,7 @@
   ;; so it is available even in :advanced release builds
   (start))
 
+#_{:clj-kondo/ignore [:unused-public]}
 (defn stop []
   ;; stop is called before any code is reloaded
   ;; this is controlled by :before-load in the config
