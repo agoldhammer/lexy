@@ -14,7 +14,7 @@
 (declare render-view)
 (declare def-view)
 (declare master-view)
-(declare stop)
+;; (declare stop)
 
 ;; for development
 (defrecord Slug [rowid src target supp lrd-from lrd-to nseen])
@@ -49,10 +49,10 @@
    (swap! app-state merge {:message-showing? t-or-f
                            :message-text text})))
 
-(defn set-login-showing!
-  "set login-showing? flag in app-state"
-  [t-or-f]
-  (swap! app-state assoc :login-showing? t-or-f))
+;; (defn set-login-showing!
+;;   "set login-showing? flag in app-state"
+;;   [t-or-f]
+;;   (swap! app-state assoc :login-showing? t-or-f))
 
 (defn previous-word!
   "set cursor back 1"
@@ -104,10 +104,10 @@
   (print "set-active-file done")
   (master-view))
 
-(defn have-active-file?
-  "has active file been set in app-state?"
-  []
-  (not (nil? (:active-file @app-state))))
+;; (defn have-active-file?
+;;   "has active file been set in app-state?"
+;;   []
+;;   (not (nil? (:active-file @app-state))))
 
 ;; view fns
 ;; --------
@@ -181,19 +181,19 @@
    {:on-click wrong-action}
    "Wrong"])
 
-(defn open-dictcc-button [src]
-  [:button.button.is-rounded.has-background-light.ml-2.is-small
-   {:on-click #(.open js/window
-                      (str "https://www.dict.cc/?s=" src)
-                      "_blank")}
-   "Lkup dict.cc"])
+;; (defn open-dictcc-button [src]
+;;   [:button.button.is-rounded.has-background-light.ml-2.is-small
+;;    {:on-click #(.open js/window
+;;                       (str "https://www.dict.cc/?s=" src)
+;;                       "_blank")}
+;;    "Lkup dict.cc"])
 
-(defn open-glosbe-button [src glosbe-url]
-  [:button.button.is-rounded.has-background-light.ml-4.is-small
-   {:on-click #(.open js/window
-                      (str glosbe-url src)
-                      "_blank")}
-   "Lkup Glosbe"])
+;; (defn open-glosbe-button [src glosbe-url]
+;;   [:button.button.is-rounded.has-background-light.ml-4.is-small
+;;    {:on-click #(.open js/window
+;;                       (str glosbe-url src)
+;;                       "_blank")}
+;;    "Lkup Glosbe"])
 
 (defn fetch-more-button []
   [:button.button.is-rounded.is-success.ml-4
