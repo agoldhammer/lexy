@@ -322,7 +322,7 @@
             [:select#lang
              [:option "German"]
              [:option "Italian"]
-             [:option "Test"]]]]]]
+             [:option "redux2"]]]]]]
 
         [:footer.modal-card-foot
          [:button.button.is-success
