@@ -5,7 +5,7 @@
 (declare debug-handler)
 (declare error-handler)
 
-(def DEBUG true)
+;; (def DEBUG true)
 
 (defn default-request-map
   []
@@ -38,24 +38,24 @@
                                   :format :json
                                   :params params})))
 
-#_(defn set-db
-  "set db to use on server"
-  [dbname]
-  (GET (str "/seldb/" dbname)
-    (default-request-map)))
+;; #_(defn set-db
+;;   "set db to use on server"
+;;   [dbname]
+;;   (GET (str "/seldb/" dbname)
+;;     (default-request-map)))
 
-(defn fetch
-  "fetch slugs from selected db"
-  []
-  (print "fetching")
-  (GET (str "/fetch")
-    (default-request-map)))
+;; (defn fetch
+;;   "fetch slugs from selected db"
+;;   []
+;;   (print "fetching")
+;;   (GET (str "/fetch")
+;;     (default-request-map)))
 
-(defn get-counts
-  "get counts of active db"
-  []
-  (GET (str "/getcount")
-    (default-request-map)))
+;; (defn get-counts
+;;   "get counts of active db"
+;;   []
+;;   (GET (str "/getcount")
+;;     (default-request-map)))
 
 (defn login
   "send login data to server"

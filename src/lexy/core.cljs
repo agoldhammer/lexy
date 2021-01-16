@@ -424,6 +424,12 @@
   (reset-def-panel!)
   (js/console.log "stop"))
 
+;; stuff to stop spurious warnings
+(when nil
+  (stop)
+  (init)
+  (Slug []))
+
 
 
 (comment
