@@ -5,8 +5,6 @@
 (declare debug-handler)
 (declare error-handler)
 
-;; (def DEBUG true)
-
 (defn default-request-map
   []
   {:handler debug-handler
