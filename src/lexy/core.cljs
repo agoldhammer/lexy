@@ -45,8 +45,11 @@
  ([t-or-f]
   (set-message-flag-and-text t-or-f ""))
   ([t-or-f text]
+   ;; TODO: works now for bad login dismissal
+   ;; but this should be changed to a more general purpose msg fn
    (swap! app-state merge {:message-showing? t-or-f
-                           :message-text text})))
+                           :message-text text
+                           :login-showing? true})))
 
 (defn previous-word!
   "set cursor back 1"
@@ -250,6 +253,7 @@
   (if (= (:login response) "rejected")
     (do (print "bad login")
         (set-active-file nil)
+        (swap! app-state assoc :logged-in? false)
         (set-message-flag-and-text true "Bad Login"))
     (do
       (set-active-file (:active-db response))
@@ -335,7 +339,8 @@
   "what to do when message dissmissed"
   []
   (print "msg-dismiss-action")
-  nil)
+  (set-message-flag-and-text false)
+  (master-view))
 
 (defn message-view
   "display modal message box"
@@ -351,6 +356,7 @@
 (defn master-view
   []
   (print "master view called")
+  (print "app state" @app-state)
   (let [{:keys [message-showing? logged-in?]} @app-state]
     
     (if message-showing?
