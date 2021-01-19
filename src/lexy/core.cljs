@@ -1,11 +1,14 @@
 (ns lexy.core
-  (:require [reagent.core :as reagent]
-            [reagent.dom :as rdom]
-            #_[reagent.session :as session]
-            #_[require reagent.cookies :as cookies]
-            [lexy.client :as client]
-            [lexy.message :refer [message-box]]
-            [lexy.cmpts :refer [lkup-button]]))
+  (:require ; [reagent.core :as reagent]
+   [reagent.dom :as rdom]
+   #_[reagent.session :as session]
+   #_[require reagent.cookies :as cookies]
+   [lexy.actions :as ax]
+   [lexy.client :as client]
+   [lexy.dbs :as dbs]
+   [lexy.infopanel :as info]
+   [lexy.message :refer [message-box]]
+   [lexy.cmpts :refer [lkup-button]]))
 
 (def DEBUG false)
 
@@ -15,27 +18,7 @@
 (declare master-view)
 
 ;; for development
-#_:clj-kondo/ignore
 (defrecord Slug [rowid src target supp lrd-from lrd-to nseen])
-
-;; define your app data so that it doesn't get over-written on reload
-
-(defonce app-state (reagent/atom {:active-file nil
-                                  :total 0
-                                  :batch-size 50
-                                  :direction :fwd
-                                  :logged-in? false
-                                  :message-showing? false
-                                  :message-text ""
-                                  :login-showing? true}))
-
-(defonce default-panel-state {:slugs []
-                              :cursor 0
-                              :dir 0
-                              :defs-loading? true
-                              :def-showing? false})
-
-(def def-panel-state (reagent/atom default-panel-state))
 
 ;; state helper fns
 ;; ----------------
@@ -47,30 +30,18 @@
   ([t-or-f text]
    ;; TODO: works now for bad login dismissal
    ;; but this should be changed to a more general purpose msg fn
-   (swap! app-state merge {:message-showing? t-or-f
+   (swap! dbs/app-state merge {:message-showing? t-or-f
                            :message-text text
                            :login-showing? true})))
 
-(defn previous-word!
-  "set cursor back 1"
-  []
-  (let [cur (:cursor @def-panel-state)]
-    (swap! def-panel-state assoc-in [:cursor] (max 0 (dec cur)))))
-
-;; TODO: add a login failed element
 (defn close-login-box!
   "set :login-showing? flag to false"
   []
-  (swap! app-state assoc :login-showing? false)
+  (swap! dbs/app-state assoc :login-showing? false)
   #(.open js/window "/"))
 
 (defn reset-def-panel! []
-  (reset! def-panel-state default-panel-state))
-
-(defn set-def-showing!
-  "set def-showing? in def-panel-state"
-  [t-or-f]
-  (swap! def-panel-state assoc :def-showing? t-or-f))
+  (reset! dbs/def-panel-state dbs/default-panel-state))
 
 (defn slug-handler
   "set slugs in def-panel-state"
@@ -86,16 +57,17 @@
       (print "loading: " (:defs-loading? new-state)))
     ;; clear out any slugs remaining from previous log
     #_(print "slughandler: before: " (take 2 (:slugs def-panel-state)))
-    (swap! def-panel-state assoc :slugs [])
+    (swap! dbs/def-panel-state assoc :slugs [])
     (when DEBUG 
-      (print "d-p-s slugs: shd be empty: " (take 2 (:slugs def-panel-state)))
+      (print "d-p-s slugs: shd be empty: " (take 2 (:slugs dbs/def-panel-state)))
       (print "new state" (take 2 (:slugs new-state))))
-    (swap! def-panel-state merge new-state)))
+    (swap! dbs/def-panel-state merge new-state)))
 
-(defn set-active-file
+(defn set-master-view
   "set active file name in app-state"
-  [fname]
-  (swap! app-state assoc-in [:active-file] fname)
+  [lang-or-nil]
+  (print "set-master-view called with lang" lang-or-nil)
+  (dbs/set-language! lang-or-nil)
   #_(client/set-db fname)
   (client/get-endpoint (str "/fetch") slug-handler)
   (print "set-active-file done")
@@ -104,26 +76,6 @@
 ;; view fns
 ;; --------
 
-(defn tagged-text
-  "elt of info panel
-    displays tag with text if not nil, else none"
-  [tag text-or-nil]
-  (if-let [text text-or-nil]
-    [:span.ml-4 (str tag ": " text)]
-    [:span.ml-4 (str tag ": None")]))
-
-(defn info-panel
-  "panel displaying info about current active settings"
-  []
-  (let [{:keys [active-file
-                batch-size
-                direction
-                total]} @app-state]
-    [:div-level.is-size-7.is-italic.has-text-info
-     (tagged-text "Active file" active-file)
-     (tagged-text "Batch size" batch-size)
-     (tagged-text "Dir" (name direction))
-     (tagged-text "Lexicon size" total)]))
 
 (defn word-box
   "element for displaying word def, and supplement"
@@ -134,68 +86,18 @@
        :type "text"
        :on-change #()}]])
 
-(defn bump-cursor
-  "bump cursor on slugs list in def-panel-state"
-  []
-  (swap! def-panel-state update-in [:cursor] inc))
-
-(defn right-action
-  "on clicking right button"
-  []
-  (set-def-showing! false)
-  (swap! def-panel-state assoc :dir (rand-int 2))
-  (bump-cursor))
-
-(defn wrong-action
-  "on clicking wrong button"
-  []
-  (set-def-showing! false)
-  (swap! def-panel-state assoc :dir (rand-int 2))
-  (bump-cursor))
-
-(defn show-def-button []
-  [:button.button.is-rounded.is-warning
-   {:on-click #(set-def-showing! true)}
-   "ShowDef"])
-
-(defn previous-word-button []
-  [:button.button.is-rounded.is-danger.ml-4
-   {:on-click previous-word!}
-   "Previous word"])
-
-(defn right-button []
-  [:button.button.is-rounded.is-success.ml-4
-   {:on-click right-action}
-   "Right"])
-
-(defn wrong-button []
-  [:button.button.is-rounded.is-danger.ml-4
-   {:on-click wrong-action}
-   "Wrong"])
-
-(defn fetch-more-button []
-  [:button.button.is-rounded.is-success.ml-4
-   {:on-click #(set-active-file (:active-file @app-state))}
-   "Done, fetch more"])
-
-;; TODO: add logout endpoint
-(defn logout-button []
-  [:button.button.is-rounded.is-danger.ml-4
-   {:on-click #(.open js/window "/")}
-   "Logout"])
-
 (defn def-panel
   "view with word and defs; choose dir randomly"
   []
-  (let [{:keys [slugs dir cursor def-showing? defs-loading?]} @def-panel-state
+  (let [{:keys [slugs dir cursor def-showing? defs-loading?]} @dbs/def-panel-state
         slug (nth slugs cursor nil)
         ;; unflipped src0 and target0 go to buttons
         [src0, target0] ((juxt :src :target) slug)
         [src, target, supp] (if (= dir 0)
                               ((juxt :src :target :supp) slug)
                               ((juxt :target :src :supp) slug))
-        logged-in? [:logged-in? @app-state]
-        lang (:active-file @app-state)]
+        logged-in? [:logged-in? @dbs/app-state]
+        lang (:active-file @dbs/app-state)]
     (when DEBUG
       (print "def-panel: " defs-loading? slug cursor
              (first slugs)))
@@ -216,11 +118,11 @@
                [:div.field.is-grouped
                 (if (not def-showing?)
                   [:div.field.is-grouped
-                   (show-def-button)
-                   (previous-word-button)]
+                   (ax/show-def-button)
+                   (ax/previous-word-button)]
                   [:div.field.is-grouped
-                   (right-button)
-                   (wrong-button)])]
+                   (ax/right-button)
+                   (ax/wrong-button)])]
                (when def-showing?
                  [:div.field.is-grouped  ;; else def-showing? is false
                   ;; when lang is "italian", :other = :reit
@@ -233,8 +135,8 @@
                   (lkup-button target0 lang :other :rev)])]
         ;; else if slug is nil
               [:div 
-               (fetch-more-button)
-               (logout-button)]))
+               (ax/fetch-more-button)
+               (ax/logout-button)]))
 ;; not logged in
           [:div "not logged in"]))))
 
@@ -244,25 +146,23 @@
   (let [elt (. js/document getElementById id)]
     (.-value elt)))
 
-(declare set-active-file)
-
 (defn login-handler
   "handle response from the login endpoint"
   [response]
   (print "login-handler: " response)
   (if (= (:login response) "rejected")
     (do (print "bad login")
-        (set-active-file nil)
-        (swap! app-state assoc :logged-in? false)
+        (dbs/set-language! nil)
+        (swap! dbs/app-state assoc :logged-in? false)
         (set-message-flag-and-text true "Bad Login"))
     (do
-      (set-active-file (:active-db response))
-      (swap! app-state merge {:logged-in? true
+      #_(dbs/set-language! (:active-db response))
+      (swap! dbs/app-state merge {:logged-in? true
                               :total (:total response)})
-      (set-def-showing! false)
+      (dbs/set-def-showing! false)
       (print "good login")))
   (close-login-box!)
-  (master-view))
+  (set-master-view (:active-db response)))
 
 (defn submit-login
   "gather values from login box and submit to server"
@@ -277,7 +177,7 @@
 (defn login-box
   "login element"
   []
-  (let [login-showing? (:login-showing? @app-state)]
+  (let [login-showing? (:login-showing? @dbs/app-state)]
     (when login-showing?
       [:div.modal.is-active
        [:div.modal-background.has-background-light-gray]
@@ -331,7 +231,7 @@
   []
   [:div#top
    [menu]
-   [info-panel]
+   [info/info-panel]
    [def-panel]])
 
 ;; TODO: should vary with type of message, now does nothing
@@ -345,7 +245,7 @@
 (defn message-view
   "display modal message box"
   []
-  (let [text (:message-text @app-state)]
+  (let [text (:message-text @dbs/app-state)]
     (message-box text true msg-dismiss-action)))
 
 (defn render-view
@@ -356,8 +256,8 @@
 (defn master-view
   []
   (print "master view called")
-  (print "app state" @app-state)
-  (let [{:keys [message-showing? logged-in?]} @app-state]
+  (print "app state" @dbs/app-state)
+  (let [{:keys [message-showing? logged-in?]} @dbs/app-state]
     
     (if message-showing?
       (render-view (message-view))
