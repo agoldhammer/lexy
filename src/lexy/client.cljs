@@ -10,7 +10,7 @@
 
 (def DEBUG false)
 
-(defn default-request-map
+(defn- default-request-map
   []
   {:handler debug-handler
    :error-handler error-handler
@@ -19,15 +19,15 @@
    :response-format :json
    :keywords? true})
 
-(defn debug-handler [response]
+(defn- debug-handler [response]
   (print "Debug handler: " response)
   #_(.log js/console response))
 
-(defn error-handler [{:keys [status status-text]}]
+(defn- error-handler [{:keys [status status-text]}]
   (print "lexy ajax error:" status status-text)
   #_(.log js/console (str "AJAX error" status " " status-text)))
 
-(defn slug-handler
+(defn- slug-handler
   "set slugs in def-panel-state"
   [response]
   #_(when DEBUG (print "slug-handler: resp: " response))
