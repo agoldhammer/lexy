@@ -1,6 +1,7 @@
 (ns lexy.defpanel
   (:require [lexy.dbs :as dbs]
-            [lexy.ax :as ax]
+            [lexy.actions :as ax]
+            [lexy.utils :refer [tagged-text]]
             [lexy.cmpts :refer [lkup-button]]
             #_[lexy.utils :as utils]))
 
@@ -30,7 +31,7 @@
     (when DEBUG
       (print "def-panel: " defs-loading? slug cursor
              (first slugs)))
-    (print "wid: " wid)
+    ;; (print "wid: " wid)  
     (if defs-loading?
       [:div [:span "Defs loading"]]
       ;; else not loading
@@ -39,6 +40,8 @@
           (print "Def panel logged in")
           (if slug
             [:div.field.ml-2.mr-10
+             [:div-level.is-size-8.is-italic.has-text-info
+              (tagged-text "wid" wid)]
              (word-box src)
              (when def-showing?
                (word-box target))
@@ -54,6 +57,7 @@
                  (ax/right-button)
                  (ax/wrong-button)])]
              (when def-showing?
+               ;; TODO: fix this!
                [:div.field.is-grouped  ;; else def-showing? is false
                   ;; when lang is "italian", :other = :reit
                   ;; when lang is "german", :other = :glosbe
