@@ -6,7 +6,7 @@
 (declare debug-handler)
 (declare error-handler)
 
-(defrecord Slug [rowid src target supp lrd-from lrd-to nseen])
+(defrecord Slug [wid src target supp])
 
 (def DEBUG false)
 

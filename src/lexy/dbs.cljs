@@ -18,6 +18,16 @@
 
 (def def-panel-state (reagent/atom default-panel-state))
 
+(defn set-login-showing 
+  "set/reset login-showing? flag"
+  [t-or-f]
+  (swap! app-state assoc :login-showing? t-or-f))
+
+(defn reset-def-panel! 
+  "reset definition panel to default state"
+  []
+  (reset! def-panel-state default-panel-state))
+
 (defn previous-word!
   "set cursor back 1"
   []
@@ -30,8 +40,27 @@
   (swap! def-panel-state assoc :def-showing? t-or-f))
 
 (defn set-language!
+  "set the language (= database name supplied by server)"
   [lang]
   (swap! app-state assoc-in [:lang] lang))
+
+(defn set-message-flag-and-text
+  "set message-showing? flag in app-state, with text if needed"
+  ([t-or-f]
+   (set-message-flag-and-text t-or-f ""))
+  ([t-or-f text]
+   ;; TODO: works now for bad login dismissal
+   ;; but this should be changed to a more general purpose msg fn
+   (swap! app-state merge {:message-showing? t-or-f
+                               :message-text text
+                               :login-showing? true})))
+
+(defn close-login-box!
+  "set :login-showing? flag to false"
+  []
+  (set-login-showing false)
+  #(.open js/window "/"))
+
 
 (comment
   (print @def-panel-state)

@@ -20,27 +20,7 @@
 ;; state helper fns
 ;; ----------------
 
-(defn set-message-flag-and-text
- "set message-showing? flag in app-state, with text if needed"
- ([t-or-f]
-  (set-message-flag-and-text t-or-f ""))
-  ([t-or-f text]
-   ;; TODO: works now for bad login dismissal
-   ;; but this should be changed to a more general purpose msg fn
-   (swap! dbs/app-state merge {:message-showing? t-or-f
-                           :message-text text
-                           :login-showing? true})))
 
-(defn close-login-box!
-  "set :login-showing? flag to false"
-  []
-  (swap! dbs/app-state assoc :login-showing? false)
-  #(.open js/window "/"))
-
-(defn reset-def-panel! []
-  (reset! dbs/def-panel-state dbs/default-panel-state))
-
-;; TODO move this into client
 (defn set-master-view
   "set active db in app-state and initiate the master view, showing word def"
   [lang-or-nil]
@@ -128,21 +108,20 @@
     (do (print "bad login")
         (dbs/set-language! nil)
         (swap! dbs/app-state assoc :logged-in? false)
-        (set-message-flag-and-text true "Bad Login"))
+        (dbs/set-message-flag-and-text true "Bad Login"))
     (do
       #_(dbs/set-language! (:active-db response))
       (swap! dbs/app-state merge {:logged-in? true
                               :total (:total response)})
       (dbs/set-def-showing! false)
       (print "good login")))
-  (close-login-box!)
+  (dbs/close-login-box!)
   (set-master-view (:active-db response)))
 
 (defn submit-login
   "gather values from login box and submit to server"
   []
   (let [[un pw lang] (mapv id->value ["un" "pw" "lang"])]
-    #_(print un pw lang)
     (client/login {:username un
                    :password pw
                    :lang lang}
@@ -180,7 +159,7 @@
          [:button.button.is-success
           {:on-click submit-login} "Login"]
          [:button.button
-          {:on-click close-login-box!} "Cancel"]]]])))
+          {:on-click dbs/close-login-box!} "Cancel"]]]])))
 
 (defn menu
   "fixed menu view"
@@ -213,7 +192,7 @@
   "what to do when message dissmissed"
   []
   (print "msg-dismiss-action")
-  (set-message-flag-and-text false)
+  (dbs/set-message-flag-and-text false)
   (master-view))
 
 (defn message-view
@@ -242,7 +221,7 @@
 (defn start
   "render the initial view"
   []
-  (reset-def-panel!)
+  (dbs/reset-def-panel!)
   (master-view))
 
 (defn ^:export init []
@@ -255,8 +234,10 @@
 (defn stop []
   ;; stop is called before any code is reloaded
   ;; this is controlled by :before-load in the config
-  (reset-def-panel!)
-  (js/console.log "stop"))
+  (dbs/reset-def-panel!)
+  (master-view)
+  #(.open js/window "/"))
+  (js/console.log "stop")
 
 ;; stuff to stop spurious warnings
 (when nil
