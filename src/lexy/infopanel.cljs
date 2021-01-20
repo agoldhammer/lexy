@@ -1,13 +1,6 @@
 (ns lexy.infopanel
-  (:require [lexy.dbs :as dbs]))
-
-(defn tagged-text
-  "elt of info panel
-    displays tag with text if not nil, else none"
-  [tag text-or-nil]
-  (if-let [text text-or-nil]
-    [:span.ml-4 (str tag ": " text)]
-    [:span.ml-4 (str tag ": None")]))
+  (:require [lexy.dbs :as dbs]
+            [lexy.utils :refer [tagged-text]]))
 
 (defn info-panel
   "panel displaying info about current active settings;
