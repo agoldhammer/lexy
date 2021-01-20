@@ -74,6 +74,25 @@
   [params handler]
   (post-endpoint "/login" params handler))
 
+(defn login-handler
+  "handle response from the login endpoint
+   view fn will be set-master-view from core
+   call as (partial login-handler set-master-view)"
+  [view-fn response]
+  (print "login-handler: " response)
+  (if (= (:login response) "rejected")
+    (do (print "bad login")
+        (dbs/set-language! nil)
+        (swap! dbs/app-state assoc :logged-in? false)
+        (dbs/set-message-flag-and-text true "Bad Login"))
+    (do
+      (swap! dbs/app-state merge {:logged-in? true
+                                  :total (:total response)})
+      (dbs/set-def-showing! false)
+      (print "good login")))
+  (dbs/close-login-box!)
+  (view-fn (:active-db response)))
+
 ;; to silence spurious warning from clojure-lsp
 (comment
   (Slug []))

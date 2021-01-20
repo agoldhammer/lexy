@@ -4,7 +4,9 @@
             [lexy.cmpts :refer [lkup-button]]
             [lexy.dbs :as dbs]
             [lexy.infopanel :as info]
+            [lexy.login :as login]
             [lexy.message :refer [message-box]]
+            [lexy.utils :as utils]
             [reagent.dom :as rdom]))
 
 (def DEBUG false)
@@ -91,72 +93,15 @@
 ;; not logged in
           [:div "not logged in"]))))
 
-(defn id->value
-  "get value of element with specified id"
-  [id]
-  (let [elt (. js/document getElementById id)]
-    (.-value elt)))
-
-(defn login-handler
-  "handle response from the login endpoint"
-  [response]
-  (print "login-handler: " response)
-  (if (= (:login response) "rejected")
-    (do (print "bad login")
-        (dbs/set-language! nil)
-        (swap! dbs/app-state assoc :logged-in? false)
-        (dbs/set-message-flag-and-text true "Bad Login"))
-    (do
-      #_(dbs/set-language! (:active-db response))
-      (swap! dbs/app-state merge {:logged-in? true
-                              :total (:total response)})
-      (dbs/set-def-showing! false)
-      (print "good login")))
-  (dbs/close-login-box!)
-  (set-master-view (:active-db response)))
 
 (defn submit-login
   "gather values from login box and submit to server"
   []
-  (let [[un pw lang] (mapv id->value ["un" "pw" "lang"])]
+  (let [[un pw] (mapv utils/id->value ["un" "pw"])]
     (client/login {:username un
-                   :password pw
-                   :lang lang}
-                  login-handler)))
+                   :password pw}
+                  (partial client/login-handler set-master-view))))
 
-(defn login-box
-  "login element"
-  []
-  (let [login-showing? (:login-showing? @dbs/app-state)]
-    (when login-showing?
-      [:div.modal.is-active
-       [:div.modal-background.has-background-light-gray]
-       [:div.modal-card
-        [:header.modal-card-head
-         [:p.modal-card-title "Lexy Login"]]
-        [:section.modal-card-body
-         [:div.field
-          [:label.label "Username"]
-          [:div.control
-           [:input#un.input {:type "text"
-                             :placeholder "username"}]]
-          [:label.label "Password"]
-          [:div.control
-           [:input#pw.input {:type "password"
-                             :placeholder "password"}]]
-          [:label.label "Language"]
-          [:div.select
-           [:div.control
-            [:select#lang
-             [:option "German"]
-             [:option "Italian"]
-             [:option "redux2"]]]]]]
-
-        [:footer.modal-card-foot
-         [:button.button.is-success
-          {:on-click submit-login} "Login"]
-         [:button.button
-          {:on-click dbs/close-login-box!} "Cancel"]]]])))
 
 (defn menu
   "fixed menu view"
@@ -212,7 +157,7 @@
     (if message-showing?
       (render-view (message-view))
       (if (not logged-in?)
-        (render-view (login-box))
+        (render-view (login/login-box submit-login))
         (render-view (def-view))))))
 
 (defn start
