@@ -1,14 +1,11 @@
 (ns lexy.core
-  (:require ; [reagent.core :as reagent]
-   [reagent.dom :as rdom]
-   #_[reagent.session :as session]
-   #_[require reagent.cookies :as cookies]
-   [lexy.actions :as ax]
-   [lexy.client :as client]
-   [lexy.dbs :as dbs]
-   [lexy.infopanel :as info]
-   [lexy.message :refer [message-box]]
-   [lexy.cmpts :refer [lkup-button]]))
+  (:require [lexy.actions :as ax]
+            [lexy.client :as client]
+            [lexy.cmpts :refer [lkup-button]]
+            [lexy.dbs :as dbs]
+            [lexy.infopanel :as info]
+            [lexy.message :refer [message-box]]
+            [reagent.dom :as rdom]))
 
 (def DEBUG false)
 

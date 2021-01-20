@@ -1,7 +1,6 @@
 (ns lexy.client
-  (:require
-   [lexy.dbs :as dbs]
-   [ajax.core :as ajax :refer [GET POST]]))
+  (:require [ajax.core :as ajax :refer [GET POST]]
+            [lexy.dbs :as dbs]))
 
 (declare debug-handler)
 (declare error-handler)
