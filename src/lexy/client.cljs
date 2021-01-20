@@ -1,9 +1,14 @@
 (ns lexy.client
   (:require
+   [lexy.dbs :as dbs]
    [ajax.core :as ajax :refer [GET POST]]))
 
 (declare debug-handler)
 (declare error-handler)
+
+(defrecord Slug [rowid src target supp lrd-from lrd-to nseen])
+
+(def DEBUG false)
 
 (defn default-request-map
   []
@@ -22,6 +27,26 @@
   (print "lexy ajax error:" status status-text)
   #_(.log js/console (str "AJAX error" status " " status-text)))
 
+(defn slug-handler
+  "set slugs in def-panel-state"
+  [response]
+  #_(when DEBUG (print "slug-handler: resp: " response))
+  (let [slugs (mapv #(apply ->Slug %) (:slugs response))
+        response1 (merge response {:slugs slugs})
+        new-state (merge response1 {:cursor 0
+                                    :defs-loading? false
+                                    :def-showing? false})]
+    (when DEBUG
+      (print "slug-handler: 2slugs: " (take 2 slugs))
+      (print "loading: " (:defs-loading? new-state)))
+    ;; clear out any slugs remaining from previous log
+    #_(print "slughandler: before: " (take 2 (:slugs def-panel-state)))
+    (swap! dbs/def-panel-state assoc :slugs [])
+    (when DEBUG
+      (print "d-p-s slugs: shd be empty: " (take 2 (:slugs dbs/def-panel-state)))
+      (print "new state" (take 2 (:slugs new-state))))
+    (swap! dbs/def-panel-state merge new-state)))
+
 (defn get-endpoint
   "get endpoint from vocab server"
   [endpoint handler]
@@ -36,28 +61,22 @@
                                   :format :json
                                   :params params})))
 
-;; #_(defn set-db
-;;   "set db to use on server"
-;;   [dbname]
-;;   (GET (str "/seldb/" dbname)
-;;     (default-request-map)))
-
-;; (defn fetch
-;;   "fetch slugs from selected db"
-;;   []
-;;   (print "fetching")
-;;   (GET (str "/fetch")
-;;     (default-request-map)))
-
-;; (defn get-counts
-;;   "get counts of active db"
-;;   []
-;;   (GET (str "/getcount")
-;;     (default-request-map)))
+(defn fetch-batch
+  ""
+  [lang-or-nil]
+  (print "fetch-batch called with lang" lang-or-nil)
+  (when (not (:lang @dbs/app-state))
+    (dbs/set-language! lang-or-nil))
+  #_(client/set-db fname)
+  (get-endpoint (str "/fetch") slug-handler))
 
 (defn login
   "send login data to server"
   [params handler]
   (post-endpoint "/login" params handler))
+
+;; to silence spurious warning from clojure-lsp
+(comment
+  (Slug []))
 
 

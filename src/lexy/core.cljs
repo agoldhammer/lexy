@@ -17,9 +17,6 @@
 (declare def-view)
 (declare master-view)
 
-;; for development
-(defrecord Slug [rowid src target supp lrd-from lrd-to nseen])
-
 ;; state helper fns
 ;; ----------------
 
@@ -43,34 +40,11 @@
 (defn reset-def-panel! []
   (reset! dbs/def-panel-state dbs/default-panel-state))
 
-(defn slug-handler
-  "set slugs in def-panel-state"
-  [response]
-  #_(when DEBUG (print "slug-handler: resp: " response))
-  (let [slugs (mapv #(apply ->Slug %) (:slugs response))
-        response1 (merge response {:slugs slugs})
-        new-state (merge response1 {:cursor 0
-                                    :defs-loading? false
-                                    :def-showing? false})]
-    (when DEBUG
-      (print "slug-handler: 2slugs: " (take 2 slugs))
-      (print "loading: " (:defs-loading? new-state)))
-    ;; clear out any slugs remaining from previous log
-    #_(print "slughandler: before: " (take 2 (:slugs def-panel-state)))
-    (swap! dbs/def-panel-state assoc :slugs [])
-    (when DEBUG 
-      (print "d-p-s slugs: shd be empty: " (take 2 (:slugs dbs/def-panel-state)))
-      (print "new state" (take 2 (:slugs new-state))))
-    (swap! dbs/def-panel-state merge new-state)))
-
+;; TODO move this into client
 (defn set-master-view
-  "set active file name in app-state"
+  "set active db in app-state and initiate the master view, showing word def"
   [lang-or-nil]
-  (print "set-master-view called with lang" lang-or-nil)
-  (dbs/set-language! lang-or-nil)
-  #_(client/set-db fname)
-  (client/get-endpoint (str "/fetch") slug-handler)
-  (print "set-active-file done")
+  (client/fetch-batch lang-or-nil)
   (master-view))
 
 ;; view fns
@@ -269,7 +243,6 @@
   "render the initial view"
   []
   (reset-def-panel!)
-  #_(render-view (start-panel))
   (master-view))
 
 (defn ^:export init []
@@ -288,8 +261,7 @@
 ;; stuff to stop spurious warnings
 (when nil
   (stop)
-  (init)
-  #_(Slug []))
+  (init))
 
 
 
