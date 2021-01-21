@@ -50,3 +50,11 @@
   [:button.button.is-rounded.is-danger.ml-4
    {:on-click #(.open js/window "/")}
    "Logout"])
+
+;; TODO: should vary with type of message, now does nothing
+(defn msg-dismiss-action
+  "what to do when message dissmissed"
+  [view-fn]
+  (print "msg-dismiss-action")
+  (dbs/set-message-flag-and-text false)
+  (view-fn))
