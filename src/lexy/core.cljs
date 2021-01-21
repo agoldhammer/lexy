@@ -1,7 +1,6 @@
 (ns lexy.core
   (:require [lexy.actions :refer [msg-dismiss-action]]
             [lexy.client :as client]
-            #_[lexy.cmpts :refer [lkup-button]]
             [lexy.defpanel :refer [def-panel]]
             [lexy.dbs :as dbs]
             [lexy.infopanel :as info]
@@ -60,14 +59,6 @@
    [info/info-panel]
    [def-panel]])
 
-;; ;; TODO: should vary with type of message, now does nothing
-;; (defn msg-dismiss-action
-;;   "what to do when message dissmissed"
-;;   []
-;;   (print "msg-dismiss-action")
-;;   (dbs/set-message-flag-and-text false)
-;;   (master-view))
-
 (defn message-view
   "display modal message box"
   []
@@ -109,7 +100,7 @@
   ;; this is controlled by :before-load in the config
   (dbs/reset-def-panel!)
   (master-view)
-  #(.open js/window "/"))
+  #_#(.open js/window "/"))
   (js/console.log "stop")
 
 ;; stuff to stop spurious warnings
