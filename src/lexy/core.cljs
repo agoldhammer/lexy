@@ -99,6 +99,7 @@
   ;; stop is called before any code is reloaded
   ;; this is controlled by :before-load in the config
   (dbs/reset-def-panel!)
+  (dbs/reset-app-state!)
   (master-view)
   #_#(.open js/window "/"))
   (js/console.log "stop")

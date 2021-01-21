@@ -11,9 +11,10 @@
   [myword]
   [:div.control.my-3.ml-4.mr-6
    [:input.input.is-medium.is-primary.mx-2.is-size-4
-    {:value myword
+    {;; :placeholder myword
+     :value myword
      :type "text"
-     :on-change #()}]])
+     :on-change #(print "change in word box")}]])
 
 (defn def-panel
   "view with word and defs; choose dir randomly"

@@ -1,14 +1,14 @@
 (ns lexy.dbs
   (:require [reagent.core :as reagent]))
 
-(defonce app-state (reagent/atom {:lang nil
-                                  :total 0
-                                  :batch-size 50
-                                  :direction :fwd
-                                  :logged-in? false
-                                  :message-showing? false
-                                  :message-text ""
-                                  :login-showing? true}))
+(defonce default-app-state  {:lang nil
+                             :total 0
+                             :batch-size 50
+                             :direction :fwd
+                             :logged-in? false
+                             :message-showing? false
+                             :message-text ""
+                             :login-showing? true})
 
 (defonce default-panel-state {:slugs []
                               :cursor 0
@@ -17,6 +17,8 @@
                               :def-showing? false})
 
 (def def-panel-state (reagent/atom default-panel-state))
+
+(def app-state (reagent/atom default-app-state))
 
 (defn set-login-showing 
   "set/reset login-showing? flag"
@@ -27,6 +29,11 @@
   "reset definition panel to default state"
   []
   (reset! def-panel-state default-panel-state))
+
+(defn reset-app-state!
+  []
+  (reset! app-state default-app-state)
+)
 
 (defn previous-word!
   "set cursor back 1"
