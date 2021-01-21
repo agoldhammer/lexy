@@ -32,8 +32,7 @@
 
 (defn reset-app-state!
   []
-  (reset! app-state default-app-state)
-)
+  (reset! app-state default-app-state))
 
 (defn previous-word!
   "set cursor back 1"

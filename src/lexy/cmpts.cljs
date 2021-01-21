@@ -18,7 +18,7 @@
   "helper function to determine url key into above maps
    for lkup buttons"
   [lang dict dir]
-  (print "lkup-url-key" lang dict dir)
+  #_(print "lkup-url-key" lang dict dir)
   (if (or (= lang "german") (= lang "redux2")
           (= lang "newgerman"))
     (cond
