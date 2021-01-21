@@ -2,8 +2,7 @@
   (:require [lexy.dbs :as dbs]
             [lexy.actions :as ax]
             [lexy.utils :refer [tagged-text]]
-            [lexy.cmpts :refer [lkup-button]]
-            #_[lexy.utils :as utils]))
+            [lexy.cmpts :refer [lkup-button]]))
 
 (def DEBUG false)
 
@@ -27,7 +26,7 @@
                                    ((juxt :wid :src :target :supp) slug)
                                    ((juxt :wid :target :src :supp) slug))
         logged-in? [:logged-in? @dbs/app-state]
-        lang (:active-file @dbs/app-state)]
+        lang (:lang @dbs/app-state)]
     (when DEBUG
       (print "def-panel: " defs-loading? slug cursor
              (first slugs)))

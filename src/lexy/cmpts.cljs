@@ -7,8 +7,8 @@
                 :reit-fwd "https://dictionary.reverso.net/italian-english/"
                 :reit-rev "https://dictionary.reverso.net/english-italian/"})
 
-(def labels {:glosbe-fwd "De-En"
-             :glosbe-rev "En-De"
+(def labels {:glosbe-fwd "Glosbe De-En"
+             :glosbe-rev "Glosbe En-De"
              :dict-cc-fwd "DictCC->Eng"
              :dict-cc-rev "DictCC->Src"
              :reit-fwd "Ital-Eng"
@@ -18,7 +18,9 @@
   "helper function to determine url key into above maps
    for lkup buttons"
   [lang dict dir]
-  (if (or (= lang "german") (= lang "test"))
+  (print "lkup-url-key" lang dict dir)
+  (if (or (= lang "german") (= lang "redux2")
+          (= lang "newgerman"))
     (cond
       (and (= dict :other) (= dir :fwd)) :glosbe-fwd
       (and (= dict :other) (= dir :rev)) :glosbe-rev
