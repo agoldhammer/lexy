@@ -33,7 +33,10 @@
       (and (= dict :other) (= dir :fwd)) :reit-fwd
       (and (= dict :other) (= dir :rev)) :reit-rev)))
 
-(defn lkup-button [words lang dict dir]
+(defn lkup-button
+  "lookup button displayed below word and definition
+   depends on the language specified; main and alternate lookups"
+  [words lang dict dir]
   (let [url-key (lkup-url-key lang dict dir)
         url (get lkup-urls url-key)
         label (get labels url-key)]
