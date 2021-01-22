@@ -83,5 +83,5 @@
 
 (comment
   (print @def-panel-state)
-  (print (dissoc :slugs @def-panel-state))
+  (print (dissoc @def-panel-state :slugs))
   (print @app-state))
