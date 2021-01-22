@@ -69,6 +69,11 @@
   #_(client/set-db fname)
   (get-endpoint (str "/fetch") slug-handler))
 
+(defn fetch-score
+  "get score for given uid and wid"
+  []
+  (get-endpoint (str "/getscore/1") debug-handler))
+
 (defn login
   "send login data to server"
   [params handler]
@@ -95,6 +100,7 @@
 
 ;; to silence spurious warning from clojure-lsp
 (comment
+  (fetch-score)
   (Slug []))
 
 
