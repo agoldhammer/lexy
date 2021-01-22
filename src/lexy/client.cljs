@@ -67,12 +67,11 @@
                                   :params params})))
 
 (defn fetch-batch
-  ""
+  "get next batch of slugs"
   [lang-or-nil]
   (print "fetch-batch called with lang" lang-or-nil)
   (when (not (:lang @dbs/app-state))
     (dbs/set-language! lang-or-nil))
-  #_(client/set-db fname)
   (get-endpoint (str "/fetch") slug-handler))
 
 (defn fetch-score
