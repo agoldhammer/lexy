@@ -1,6 +1,7 @@
 (ns lexy.defpanel
   (:require [lexy.dbs :as dbs]
             [lexy.actions :as ax]
+            [lexy.client :as client]
             [lexy.utils :refer [tagged-text]]
             [lexy.cmpts :refer [lkup-button]]))
 
@@ -15,6 +16,19 @@
      :value myword
      :type "text"
      :on-change #(print "change in word box")}]])
+
+(defn score-panel
+  "display score"
+  [wid]
+  (let [{:keys [sid wid lrndsrc
+                lrndtgt nseen] :as score} (dbs/get-current-score)]
+    (print "score-panel:" lrndsrc lrndtgt nseen score)
+    [:div-level.is-size-8.is-italic.has-text-info
+     (tagged-text "wid" wid)
+     (tagged-text "sid" sid)
+     (tagged-text "Learned fwd" lrndsrc)
+     (tagged-text "Learned bwd" lrndtgt)
+     (tagged-text "Times seen" nseen)]))
 
 (defn def-panel
   "view with word and defs; choose dir randomly"
@@ -31,7 +45,9 @@
     (when DEBUG
       (print "def-panel: " defs-loading? slug cursor
              (first slugs)))
-    ;; (print "wid: " wid)  
+    ;; (print "wid: " wid) 
+    (when (nil? (dbs/get-current-score))
+      (client/fetch-score wid)) 
     (if defs-loading?
       [:div [:span "Defs loading"]]
       ;; else not loading
@@ -40,8 +56,9 @@
           (print "Def panel logged in")
           (if slug
             [:div.field.ml-2.mr-10
-             [:div-level.is-size-8.is-italic.has-text-info
-              (tagged-text "wid" wid)]
+             #_[:div-level.is-size-8.is-italic.has-text-info]
+              #_(tagged-text "wid" wid)
+             (score-panel wid)
              (word-box src)
              (when def-showing?
                (word-box target))

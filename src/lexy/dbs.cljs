@@ -11,6 +11,7 @@
                              :login-showing? true})
 
 (defonce default-panel-state {:slugs []
+                              :current-score nil
                               :cursor 0
                               :dir 0
                               :defs-loading? true
@@ -29,6 +30,18 @@
   "reset definition panel to default state"
   []
   (reset! def-panel-state default-panel-state))
+
+(defn set-current-score
+  "set (or reset) the current score map"
+  [score-map-or-nil]
+  (swap! def-panel-state assoc :current-score score-map-or-nil)
+  )
+
+(defn get-current-score
+  "return the current score map"
+  []
+  (:current-score @def-panel-state))
+
 
 (defn reset-app-state!
   []
@@ -70,4 +83,5 @@
 
 (comment
   (print @def-panel-state)
+  (print (dissoc :slugs @def-panel-state))
   (print @app-state))

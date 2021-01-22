@@ -46,6 +46,12 @@
       (print "new state" (take 2 (:slugs new-state))))
     (swap! dbs/def-panel-state merge new-state)))
 
+(defn- fetch-score-handler
+  "modify current-score in db"
+  [response]
+  (print (str "fsh: " response))
+  (dbs/set-current-score response))
+
 (defn get-endpoint
   "get endpoint from vocab server"
   [endpoint handler]
@@ -70,9 +76,10 @@
   (get-endpoint (str "/fetch") slug-handler))
 
 (defn fetch-score
-  "get score for given uid and wid"
-  []
-  (get-endpoint (str "/getscore/1") debug-handler))
+  "get score for wid and current user"
+  [wid]
+  (print "fetching score for wid: " wid)
+  (get-endpoint (str "/getscore/" wid) fetch-score-handler))
 
 (defn login
   "send login data to server"
@@ -100,7 +107,8 @@
 
 ;; to silence spurious warning from clojure-lsp
 (comment
-  (fetch-score)
+  (fetch-score 1877)
+  (print (dissoc :slugs  dbs/def-panel-state))
   (Slug []))
 
 

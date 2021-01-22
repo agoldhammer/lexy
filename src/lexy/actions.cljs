@@ -4,6 +4,7 @@
 (defn bump-cursor
   "bump cursor on slugs list in def-panel-state"
   []
+  (dbs/set-current-score nil) ;; reset score to trigger next fetch
   (swap! dbs/def-panel-state update-in [:cursor] inc))
 
 (defn right-action
