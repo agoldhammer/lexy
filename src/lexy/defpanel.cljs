@@ -30,6 +30,29 @@
      (tagged-text "Learned bwd" lrndtgt)
      (tagged-text "Times seen" nseen)]))
 
+(defn button-array [def-showing?]
+  [:div.field.is-grouped
+              (if (not def-showing?)
+                [:div.field.is-grouped
+                 (ax/show-def-button)
+                 (ax/previous-word-button)]
+                [:div.field.is-grouped
+                 (ax/right-button)
+                 (ax/wrong-button)])])
+
+(defn lkup-array [lang src0 def-showing? target0]
+  (when def-showing?
+               ;; TODO: fix this!
+               [:div.field.is-grouped  ;; else def-showing? is false
+                  ;; when lang is "italian", :other = :reit
+                  ;; when lang is "german", :other = :glosbe
+                (when (not= lang "italian")
+                  (list
+                   (lkup-button src0 lang :dict-cc :fwd)
+                   (lkup-button target0 lang :dict-cc :rev)))
+                (lkup-button src0 lang :other :fwd)
+                (lkup-button target0 lang :other :rev)]))
+
 (defn def-panel
   "view with word and defs; choose dir randomly"
   []
@@ -56,34 +79,18 @@
           (print "Def panel logged in")
           (if slug
             [:div.field.ml-2.mr-10
-             #_[:div-level.is-size-8.is-italic.has-text-info]
-              #_(tagged-text "wid" wid)
              (score-panel wid)
-             (word-box src)
+             (word-box src) ;; this is the word to be defined
              (when def-showing?
-               (word-box target))
+               (word-box target)) ;; this is the definition
              (when (and def-showing?
                         (not= supp ""))
-               (word-box (:supp slug)))
-             [:div.field.is-grouped
-              (if (not def-showing?)
-                [:div.field.is-grouped
-                 (ax/show-def-button)
-                 (ax/previous-word-button)]
-                [:div.field.is-grouped
-                 (ax/right-button)
-                 (ax/wrong-button)])]
-             (when def-showing?
-               ;; TODO: fix this!
-               [:div.field.is-grouped  ;; else def-showing? is false
-                  ;; when lang is "italian", :other = :reit
-                  ;; when lang is "german", :other = :glosbe
-                (when (not= lang "italian")
-                  (list
-                   (lkup-button src0 lang :dict-cc :fwd)
-                   (lkup-button target0 lang :dict-cc :rev)))
-                (lkup-button src0 lang :other :fwd)
-                (lkup-button target0 lang :other :rev)])]
+               (word-box (:supp slug))) ;; this is the supplement
+             ;; showdef/prevword or right/wrong depending on state
+             (button-array def-showing?)
+             ;; right wrong
+             ;; lookup buttons
+             (lkup-array lang src0 def-showing? target0)]
         ;; else if slug is nil
             [:div
              (ax/fetch-more-button)
