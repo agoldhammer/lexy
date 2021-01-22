@@ -20,7 +20,7 @@
 (defn score-panel
   "display score"
   [wid]
-  (let [{:keys [sid wid lrndsrc
+  (let [{:keys [sid lrndsrc
                 lrndtgt nseen] :as score} (dbs/get-current-score)]
     (print "score-panel:" lrndsrc lrndtgt nseen score)
     [:div-level.is-size-8.is-italic.has-text-info
