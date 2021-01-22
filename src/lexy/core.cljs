@@ -112,10 +112,10 @@
 
 
 (comment
-  @app-state
+  @dbs/app-state
   (. js/document -location)
   #_(make-filemenu-body (:files @app-state))
-  @def-panel-state
+  @dbs/def-panel-state
   (:defs-loading? @def-panel-state)
   (:def-showing? @def-panel-state)
   (master-view)

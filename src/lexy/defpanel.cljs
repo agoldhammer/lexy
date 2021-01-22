@@ -15,7 +15,8 @@
     {;; :placeholder myword
      :value myword
      :type "text"
-     :on-change #(print "change in word box")}]])
+     ;; :on-change #(print "change in word box")
+     }]])
 
 (defn score-panel
   "display score"
