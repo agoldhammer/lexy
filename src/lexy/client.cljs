@@ -78,8 +78,9 @@
 (defn fetch-score
   "get score for wid and current user"
   [wid]
-  (print "fetching score for wid: " wid)
-  (get-endpoint (str "/getscore/" wid) fetch-score-handler))
+  (when (not (nil? wid))
+    (print "fetching score for wid: " wid)
+    (get-endpoint (str "/getscore/" wid) fetch-score-handler)))
 
 (defn login
   "send login data to server"
