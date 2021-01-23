@@ -3,20 +3,34 @@
             [lexy.actions :as ax]
             [lexy.client :as client]
             [lexy.utils :refer [tagged-text]]
-            [lexy.cmpts :refer [lkup-button]]))
+            [lexy.cmpts :refer [lkup-button]]
+            [reagent.core :as reagent]))
 
 (def DEBUG false)
 
 (defn word-box
   "element for displaying word def, and supplement"
-  [myword]
-  [:div.control.my-3.ml-4.mr-6
-   [:input.input.is-medium.is-primary.mx-2.is-size-4
-    {;; :placeholder myword
-     :value myword
-     :type "text"
-     ;; :on-change #(print "change in word box")
-     }]])
+  [_ myword]
+  (let [word-atom (reagent/atom myword)]
+    (fn [id myword]
+      [:div.control.my-3.ml-4.mr-6
+       [:input.input.is-medium.is-primary.mx-2.is-size-4
+        {:id id
+         :defaultValue myword
+         :value @word-atom
+         :type "text"
+         :on-change #(reset! word-atom (-> % .-target .-value))}]])))
+
+;; #_(defn word-box
+;;   "element for displaying word def, and supplement"
+;;   [myword]
+;;     [:div.control.my-3.ml-4.mr-6
+;;      [:input.input.is-medium.is-primary.mx-2.is-size-4
+;;       {;; :placeholder myword
+;;        :value myword
+;;        :type "text"
+;;        }]])
+
 
 (defn score-panel
   "display score"
@@ -81,12 +95,12 @@
           (if slug
             [:div.field.ml-2.mr-10
              (score-panel wid)
-             (word-box src) ;; this is the word to be defined
+             [word-box "src" src] ;; this is the word to be defined
              (when def-showing?
-               (word-box target)) ;; this is the definition
+               [word-box "tgt" target]) ;; this is the definition
              (when (and def-showing?
                         (not= supp ""))
-               (word-box (:supp slug))) ;; this is the supplement
+               [word-box "supp" (:supp slug)]) ;; this is the supplement
              ;; showdef/prevword or right/wrong depending on state
              (button-array def-showing?)
              ;; right wrong
