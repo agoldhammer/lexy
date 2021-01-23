@@ -4,21 +4,20 @@
 (defn bump-cursor
   "bump cursor on slugs list in def-panel-state"
   []
+  (dbs/set-def-showing! false)
+  (swap! dbs/def-panel-state assoc :dir (rand-int 2))
   (dbs/set-current-score nil) ;; reset score to trigger next fetch
+  (dbs/set-slug-changed false) ;; reset the slug changed flag
   (swap! dbs/def-panel-state update-in [:cursor] inc))
 
 (defn right-action
   "on clicking right button"
   []
-  (dbs/set-def-showing! false)
-  (swap! dbs/def-panel-state assoc :dir (rand-int 2))
   (bump-cursor))
 
 (defn wrong-action
   "on clicking wrong button"
   []
-  (dbs/set-def-showing! false)
-  (swap! dbs/def-panel-state assoc :dir (rand-int 2))
   (bump-cursor))
 
 (defn show-def-button

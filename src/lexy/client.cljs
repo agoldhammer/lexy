@@ -72,6 +72,7 @@
   (print "fetch-batch called with lang" lang-or-nil)
   (when (not (:lang @dbs/app-state))
     (dbs/set-language! lang-or-nil))
+  (dbs/set-defs-loading true)
   (get-endpoint (str "/fetch") slug-handler))
 
 (defn fetch-score

@@ -3,22 +3,29 @@
             [lexy.actions :as ax]
             [lexy.client :as client]
             [lexy.utils :refer [tagged-text]]
-            [lexy.cmpts :refer [lkup-button]]
-            [reagent.core :as reagent]))
+            [lexy.cmpts :refer [lkup-button]]))
 
 (def DEBUG false)
 
+;; TODO fixthis
+(defn- slug-has-changed
+  "called by word-box when any part of slug is changed"
+  [id event]
+  (print "slug changed called" id (.. event -target -value))
+  (dbs/modify-current-slug id (.. event -target -value)))
+
 (defn word-box
   "element for displaying word def, and supplement"
-  [_ myword]
-  (let [word-atom (reagent/atom myword)]
-    (fn [id _]
-      [:div.control.my-3.ml-4.mr-6
-       [:input.input.is-medium.is-primary.mx-2.is-size-4
-        {:id id
-         :value @word-atom
-         :type "text"
-         :on-change #(reset! word-atom (-> % .-target .-value))}]])))
+  [id myword]
+  (print "word-box called with" id myword)
+  (fn [id myword]
+    (print "wordbox" id myword)
+    [:div.control.my-3.ml-4.mr-6
+     [:input.input.is-medium.is-primary.mx-2.is-size-4
+      {:id id
+       :value myword
+       :type "text"
+       :on-change #(slug-has-changed id %)}]]))
 
 (defn check-wordbox
   "get value of element with specified id"
@@ -31,8 +38,8 @@
   "display score"
   [wid]
   (let [{:keys [sid lrndsrc
-                lrndtgt nseen] :as score} (dbs/get-current-score)]
-    (print "score-panel:" lrndsrc lrndtgt nseen score)
+                lrndtgt nseen]} (dbs/get-current-score)]
+    #_(print "score-panel:" lrndsrc lrndtgt nseen score)
     [:div-level.is-size-8.is-italic.has-text-info
      (tagged-text "wid" wid)
      (tagged-text "sid" sid)
@@ -70,7 +77,10 @@
         slug (nth slugs cursor nil)
         ;; unflipped src0 and target0 go to buttons
         [src0, target0] ((juxt :src :target) slug)
-        [wid, src, target, supp] (if (= dir 0)
+        flipped (= dir 0)
+        srcid (if flipped "target" "src")
+        targetid (if flipped "src" "target")
+        [wid, src, target, supp] (if (not flipped)
                                    ((juxt :wid :src :target :supp) slug)
                                    ((juxt :wid :target :src :supp) slug))
         logged-in? [:logged-in? @dbs/app-state]
@@ -90,12 +100,12 @@
           (if slug
             [:div.field.ml-2.mr-10
              (score-panel wid)
-             [word-box "src" src] ;; this is the word to be defined
+             [word-box srcid src] ;; this is the word to be defined
              (when def-showing?
-               [word-box "tgt" target]) ;; this is the definition
+               [word-box targetid target]) ;; this is the definition
              (when (and def-showing?
                         (not= supp ""))
-               [word-box "supp" (:supp slug)]) ;; this is the supplement
+               [word-box "supp" (:supp supp)]) ;; this is the supplement
              ;; showdef/prevword or right/wrong depending on state
              (button-array def-showing?)
              ;; right wrong

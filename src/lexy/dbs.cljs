@@ -12,6 +12,7 @@
 
 (defonce default-panel-state {:slugs []
                               :current-score nil
+                              :slug-changed? false
                               :cursor 0
                               :dir 0
                               :defs-loading? true
@@ -79,6 +80,29 @@
   []
   (set-login-showing false)
   #(.open js/window "/"))
+
+(defn set-slug-changed
+  "set or reset the slug-changed? flag"
+  [true-or-false]
+  (swap! def-panel-state assoc :slug-changed? true-or-false)
+  )
+
+(defn modify-current-slug
+  [id new-value]
+  (let [key (keyword id)
+        cursor (:cursor @def-panel-state)
+        slugs (:slugs @def-panel-state)
+        old-slug (nth slugs cursor)
+        new-slug (assoc old-slug key new-value)]
+    (print "old new slugs" old-slug new-slug)
+    (swap! def-panel-state assoc :slugs (assoc slugs cursor new-slug))
+    (print "new item" (nth (:slugs @def-panel-state) cursor))
+    (set-slug-changed true)))
+
+(defn set-defs-loading
+  "set or reset the defs loading flag"
+  [true-or-false]
+  (swap! def-panel-state assoc :defs-loading? true-or-false))
 
 
 (comment
