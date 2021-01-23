@@ -12,14 +12,19 @@
   "element for displaying word def, and supplement"
   [_ myword]
   (let [word-atom (reagent/atom myword)]
-    (fn [id myword]
+    (fn [id _]
       [:div.control.my-3.ml-4.mr-6
        [:input.input.is-medium.is-primary.mx-2.is-size-4
         {:id id
-         :defaultValue myword
          :value @word-atom
          :type "text"
          :on-change #(reset! word-atom (-> % .-target .-value))}]])))
+
+(defn check-wordbox
+  "get value of element with specified id"
+  [id]
+  (let [elt (. js/document getElementById id)]
+    (print "value" (.-value elt))))
 
 
 (defn score-panel
@@ -102,3 +107,7 @@
              (ax/logout-button)]))
 ;; not logged in
         [:div "not logged in"]))))
+
+(comment
+  (check-wordbox "src")
+  (check-wordbox "tgt"))
