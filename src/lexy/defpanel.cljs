@@ -21,16 +21,6 @@
          :type "text"
          :on-change #(reset! word-atom (-> % .-target .-value))}]])))
 
-;; #_(defn word-box
-;;   "element for displaying word def, and supplement"
-;;   [myword]
-;;     [:div.control.my-3.ml-4.mr-6
-;;      [:input.input.is-medium.is-primary.mx-2.is-size-4
-;;       {;; :placeholder myword
-;;        :value myword
-;;        :type "text"
-;;        }]])
-
 
 (defn score-panel
   "display score"
