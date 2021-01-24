@@ -32,16 +32,10 @@
   []
   (reset! def-panel-state default-panel-state))
 
-(defn set-current-score
-  "set (or reset) the current score map"
-  [score-map-or-nil]
-  (swap! def-panel-state assoc :current-score score-map-or-nil)
-  )
-
-(defn get-current-score
-  "return the current score map"
+(defn current-score
+  "cursor for current score"
   []
-  (:current-score @def-panel-state))
+  (reagent/cursor def-panel-state [:current-score]))
 
 
 (defn reset-app-state!

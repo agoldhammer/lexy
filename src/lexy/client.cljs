@@ -50,7 +50,7 @@
   "modify current-score in db"
   [response]
   (print (str "fsh: " response))
-  (dbs/set-current-score response))
+  (reset! (dbs/current-score) response))
 
 (defn get-endpoint
   "get endpoint from vocab server"

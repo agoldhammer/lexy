@@ -38,7 +38,7 @@
   "display score"
   [wid]
   (let [{:keys [sid lrndsrc
-                lrndtgt nseen]} (dbs/get-current-score)]
+                lrndtgt nseen]} @(dbs/current-score)]
     #_(print "score-panel:" lrndsrc lrndtgt nseen score)
     [:div-level.is-size-8.is-italic.has-text-info
      (tagged-text "wid" wid)
@@ -89,7 +89,7 @@
       (print "def-panel: " defs-loading? slug cursor
              (first slugs)))
     ;; (print "wid: " wid) 
-    (when (nil? (dbs/get-current-score))
+    (when (nil? @(dbs/current-score))
       (client/fetch-score wid)) 
     (if defs-loading?
       [:div [:span "Defs loading"]]

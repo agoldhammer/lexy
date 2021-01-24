@@ -6,7 +6,7 @@
   []
   (dbs/set-def-showing! false)
   (swap! dbs/def-panel-state assoc :dir (rand-int 2))
-  (dbs/set-current-score nil) ;; reset score to trigger next fetch
+  (reset! (dbs/current-score) nil) ;; reset score to trigger next fetch
   (dbs/set-slug-changed false) ;; reset the slug changed flag
   (swap! dbs/def-panel-state update-in [:cursor] inc))
 
