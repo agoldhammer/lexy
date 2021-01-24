@@ -99,7 +99,7 @@
           (print "Def panel logged in")
           (if slug
             [:div.field.ml-2.mr-10
-             (score-panel wid)
+             [score-panel wid]
              [word-box srcid src] ;; this is the word to be defined
              (when def-showing?
                [word-box targetid target]) ;; this is the definition
@@ -120,4 +120,4 @@
 
 (comment
   (check-wordbox "src")
-  (check-wordbox "tgt"))
+  (check-wordbox "target"))
