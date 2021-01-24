@@ -49,7 +49,7 @@
 (defn- fetch-score-handler
   "modify current-score in db"
   [response]
-  (print (str "fsh: " response))
+  #_(print (str "fsh: " response))
   (reset! (dbs/current-score) response))
 
 (defn get-endpoint
@@ -79,7 +79,7 @@
   "get score for wid and current user"
   [wid]
   (when (not (nil? wid))
-    (print "fetching score for wid: " wid)
+    #_(print "fetching score for wid: " wid)
     (get-endpoint (str "/getscore/" wid) fetch-score-handler)))
 
 (defn login

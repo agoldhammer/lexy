@@ -4,11 +4,17 @@
 (defn bump-cursor
   "bump cursor on slugs list in def-panel-state"
   []
-  (dbs/set-def-showing! false)
-  (swap! dbs/def-panel-state assoc :dir (rand-int 2))
-  (reset! (dbs/current-score) nil) ;; reset score to trigger next fetch
-  (dbs/set-slug-changed false) ;; reset the slug changed flag
-  (swap! dbs/def-panel-state update-in [:cursor] inc))
+  (let [score-cursor (dbs/current-score)
+        {:keys [sid uid wid lrndsrc lrndtgt nseen] :as score} @score-cursor]
+    (dbs/set-def-showing! false)
+    (swap! dbs/def-panel-state assoc :dir (rand-int 2))
+    ;; modify score as appropriate
+    (print "score before modification" score)
+    (let [newscore (merge score {:nseen (inc nseen)})]
+      (print "scpre after modification" newscore))
+    (reset! (dbs/current-score) nil) ;; reset score to trigger next fetch
+    (dbs/set-slug-changed false) ;; reset the slug changed flag
+    (swap! dbs/def-panel-state update-in [:cursor] inc)))
 
 (defn right-action
   "on clicking right button"

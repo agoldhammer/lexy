@@ -17,9 +17,9 @@
 (defn word-box
   "element for displaying word def, and supplement"
   [id myword]
-  (print "word-box called with" id myword)
+  #_(print "word-box called with" id myword)
   (fn [id myword]
-    (print "wordbox" id myword)
+    #_(print "wordbox" id myword)
     [:div.control.my-3.ml-4.mr-6
      [:input.input.is-medium.is-primary.mx-2.is-size-4
       {:id id
@@ -96,7 +96,7 @@
       ;; else not loading
       (if logged-in?
         (do
-          (print "Def panel logged in")
+          #_(print "Def panel logged in")
           (if slug
             [:div.field.ml-2.mr-10
              [score-panel wid]
