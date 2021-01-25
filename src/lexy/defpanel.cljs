@@ -8,11 +8,12 @@
 (def DEBUG false)
 
 ;; TODO fixthis
-(defn- slug-has-changed
+(defn- modify-slug
   "called by word-box when any part of slug is changed"
   [id event]
-  (print "slug changed called" id (.. event -target -value))
-  (dbs/modify-current-slug id (.. event -target -value)))
+  #_(print "slug changed called" id (.. event -target -value))
+  (dbs/modify-current-slug id (.. event -target -value))
+  (dbs/set-slug-changed true))
 
 (defn word-box
   "element for displaying word def, and supplement"
@@ -23,7 +24,7 @@
     {:id id
      :value myword
      :type "text"
-     :on-change #(slug-has-changed id %)}]])
+     :on-change #(modify-slug id %)}]])
 
 (defn check-wordbox
   "get value of element with specified id"
@@ -83,7 +84,7 @@
     (when DEBUG
       (print "def-panel: " defs-loading? slug cursor
              (first slugs)))
-    (print "in def-panel: flipped " flipped) 
+    #_(print "in def-panel: flipped " flipped) 
     (when (nil? @(dbs/current-score))
       (client/fetch-score wid)) 
     (if defs-loading?
@@ -94,11 +95,11 @@
           [:div.field.ml-2.mr-10
            [score-panel wid]
            [word-box srcid src] ;; this is the word to be defined
+           ;; even if supp is blank, show box, so can be edited
            (when def-showing?
-             [word-box targetid target]) ;; this is the definition
-           (when (and def-showing?
-                      (not= supp ""))
-             [word-box "supp" (:supp supp)]) ;; this is the supplement
+             [:<>
+              [word-box targetid target] ;; this is the definition
+              [word-box "supp" (:supp supp)]]) ;; this is the supplement
              ;; showdef/prevword or right/wrong depending on state
            [button-array def-showing?]
            (when def-showing?
@@ -110,7 +111,7 @@
            (ax/fetch-more-button)
            (ax/logout-button)])
 ;; not logged in
-        [:div "not logged in"]))))
+        [:div "Internal error: def-panel-view called when not logged in"]))))
 
 (comment
   (check-wordbox "src")

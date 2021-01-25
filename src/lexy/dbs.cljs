@@ -41,6 +41,11 @@
   []
   (reagent/cursor def-panel-state [:current-score]))
 
+(defn has-slug-changed?
+  "returns true if current slug has changed, false otherwise"
+  []
+  (:slug-changed? @def-panel-state))
+
 
 (defn reset-app-state!
   []
@@ -109,4 +114,5 @@
   (print @def-panel-state)
   (print (dissoc @def-panel-state :slugs))
   (print @app-state)
-  (print (coin-flip)))
+  (print (coin-flip))
+  (has-slug-changed?))

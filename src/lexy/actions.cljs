@@ -5,14 +5,18 @@
   "bump cursor on slugs list in def-panel-state"
   []
   (let [score-cursor (dbs/current-score)
-        {:keys [lrndsrc lrndtgt nseen] :as score} @score-cursor]
+        {:keys [#_lrndsrc #_lrndtgt nseen] :as score} @score-cursor]
     (dbs/set-def-showing! false)
     (swap! dbs/def-panel-state assoc :flipped (dbs/coin-flip))
     ;; modify score as appropriate
     (print "score before modification" score)
     (let [newscore (merge score {:nseen (inc nseen)})]
-      (print "scpre after modification" newscore))
-    (reset! (dbs/current-score) nil) ;; reset score to trigger next fetch
+      (print "score after modification" newscore))
+    (print "changed?" (dbs/has-slug-changed?))
+    (if (dbs/has-slug-changed?)
+      (print "slug has changed")
+      (print "slug has not changed"))
+    (reset! score-cursor nil) ;; reset score to trigger next fetch
     (dbs/set-slug-changed false) ;; reset the slug changed flag
     (swap! dbs/def-panel-state update-in [:cursor] inc)))
 
