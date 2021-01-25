@@ -5,7 +5,7 @@
   "bump cursor on slugs list in def-panel-state"
   []
   (let [score-cursor (dbs/current-score)
-        {:keys [sid uid wid lrndsrc lrndtgt nseen] :as score} @score-cursor]
+        {:keys [lrndsrc lrndtgt nseen] :as score} @score-cursor]
     (dbs/set-def-showing! false)
     (swap! dbs/def-panel-state assoc :flipped (dbs/coin-flip))
     ;; modify score as appropriate

@@ -18,14 +18,12 @@
   "element for displaying word def, and supplement"
   [id myword]
   #_(print "word-box called with" id myword)
-  (fn [id myword]
-    #_(print "wordbox" id myword)
-    [:div.control.my-3.ml-4.mr-6
-     [:input.input.is-medium.is-primary.mx-2.is-size-4
-      {:id id
-       :value myword
-       :type "text"
-       :on-change #(slug-has-changed id %)}]]))
+  [:div.control.my-3.ml-4.mr-6
+   [:input.input.is-medium.is-primary.mx-2.is-size-4
+    {:id id
+     :value myword
+     :type "text"
+     :on-change #(slug-has-changed id %)}]])
 
 (defn check-wordbox
   "get value of element with specified id"
