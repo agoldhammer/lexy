@@ -57,27 +57,24 @@
                  (ax/right-button)
                  (ax/wrong-button)])])
 
-(defn lkup-array [lang src0 def-showing? target0]
-  (when def-showing?
-               ;; TODO: fix this!
-               [:div.field.is-grouped  ;; else def-showing? is false
+(defn lkup-array [lang src target flipped]
+  [:div.field.is-grouped  ;; else def-showing? is false
                   ;; when lang is "italian", :other = :reit
                   ;; when lang is "german", :other = :glosbe
-                (when (not= lang "italian")
-                  (list
-                   (lkup-button src0 lang :dict-cc :fwd)
-                   (lkup-button target0 lang :dict-cc :rev)))
-                (lkup-button src0 lang :other :fwd)
-                (lkup-button target0 lang :other :rev)]))
+   (when (not= lang "italian")
+     (list
+      (lkup-button src target lang :dict-cc :fwd flipped)
+      (lkup-button src target lang :dict-cc :rev flipped)))
+   (lkup-button src target lang :other :fwd flipped)
+   (lkup-button src target lang :other :rev flipped)])
 
 (defn def-panel
-  "view with word and defs; choose dir randomly"
+  "view with word and defs"
   []
-  (let [{:keys [slugs dir cursor def-showing? defs-loading?]} @dbs/def-panel-state
+  (let [{:keys [slugs flipped cursor def-showing? defs-loading?]} @dbs/def-panel-state
         slug (nth slugs cursor nil)
         ;; unflipped src0 and target0 go to buttons
-        [src0, target0] ((juxt :src :target) slug)
-        flipped (= dir 0)
+        ;; [src0, target0] ((juxt :src :target) slug)
         srcid (if flipped "target" "src")
         targetid (if flipped "src" "target")
         [wid, src, target, supp] (if (not flipped)
@@ -88,33 +85,32 @@
     (when DEBUG
       (print "def-panel: " defs-loading? slug cursor
              (first slugs)))
-    ;; (print "wid: " wid) 
+    (print "in def-panel: flipped " flipped) 
     (when (nil? @(dbs/current-score))
       (client/fetch-score wid)) 
     (if defs-loading?
       [:div [:span "Defs loading"]]
       ;; else not loading
       (if logged-in?
-        (do
-          #_(print "Def panel logged in")
-          (if slug
-            [:div.field.ml-2.mr-10
-             [score-panel wid]
-             [word-box srcid src] ;; this is the word to be defined
-             (when def-showing?
-               [word-box targetid target]) ;; this is the definition
-             (when (and def-showing?
-                        (not= supp ""))
-               [word-box "supp" (:supp supp)]) ;; this is the supplement
+        (if slug
+          [:div.field.ml-2.mr-10
+           [score-panel wid]
+           [word-box srcid src] ;; this is the word to be defined
+           (when def-showing?
+             [word-box targetid target]) ;; this is the definition
+           (when (and def-showing?
+                      (not= supp ""))
+             [word-box "supp" (:supp supp)]) ;; this is the supplement
              ;; showdef/prevword or right/wrong depending on state
-             (button-array def-showing?)
+           [button-array def-showing?]
+           (when def-showing?
              ;; right wrong
              ;; lookup buttons
-             (lkup-array lang src0 def-showing? target0)]
+             [lkup-array lang src target flipped])]
         ;; else if slug is nil
-            [:div
-             (ax/fetch-more-button)
-             (ax/logout-button)]))
+          [:div
+           (ax/fetch-more-button)
+           (ax/logout-button)])
 ;; not logged in
         [:div "not logged in"]))))
 

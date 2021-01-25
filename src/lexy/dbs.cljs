@@ -1,10 +1,14 @@
 (ns lexy.dbs
   (:require [reagent.core :as reagent]))
 
+(defn coin-flip
+  "flip coin, return true if heads, false if tails"
+  []
+  (= 0 (rand-int 2)))
+
 (defonce default-app-state  {:lang nil
                              :total 0
                              :batch-size 50
-                             :direction :fwd
                              :logged-in? false
                              :message-showing? false
                              :message-text ""
@@ -14,7 +18,7 @@
                               :current-score nil
                               :slug-changed? false
                               :cursor 0
-                              :dir 0
+                              :flipped (coin-flip)
                               :defs-loading? true
                               :def-showing? false})
 
@@ -99,7 +103,10 @@
   (swap! def-panel-state assoc :defs-loading? true-or-false))
 
 
+
+
 (comment
   (print @def-panel-state)
   (print (dissoc @def-panel-state :slugs))
-  (print @app-state))
+  (print @app-state)
+  (print (coin-flip)))

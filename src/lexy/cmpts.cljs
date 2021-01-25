@@ -9,40 +9,50 @@
 
 (def labels {:glosbe-fwd "Glosbe De-En"
              :glosbe-rev "Glosbe En-De"
-             :dict-cc-fwd "DictCC->Eng"
-             :dict-cc-rev "DictCC->Src"
+             :dict-cc-fwd "DictCC De-Eng"
+             :dict-cc-rev "DictCC Eng->De"
              :reit-fwd "Ital-Eng"
              :reit-rev "Eng-Ital"})
 
 (defn lkup-url-key
   "helper function to determine url key into above maps
    for lkup buttons"
-  [lang dict dir]
-  #_(print "lkup-url-key" lang dict dir)
+  [lang dict direction]
+  #_(print "lkup-url-key" lang dict flipped)
   (if (or (= lang "german") (= lang "redux2")
           (= lang "newgerman"))
     (cond
-      (and (= dict :other) (= dir :fwd)) :glosbe-fwd
-      (and (= dict :other) (= dir :rev)) :glosbe-rev
-      (and (= dict :dict-cc) (= dir :fwd)) :dict-cc-fwd
-      (and (= dict :dict-cc) (= dir :rev)) :dict-cc-rev)
+      (and (= dict :other) (= direction :fwd)) :glosbe-fwd
+      (and (= dict :other) (= direction :rev)) :glosbe-rev
+      (and (= dict :dict-cc) (= direction :fwd)) :dict-cc-fwd
+      (and (= dict :dict-cc) (= direction :rev)) :dict-cc-rev)
     
     (cond
-      (and (= dict :dict-cc) (= dir :fwd)) :dict-cc-fwd
-      (and (= dict :dict-cc) (= dir :rev)) :dict-cc-rev
-      (and (= dict :other) (= dir :fwd)) :reit-fwd
-      (and (= dict :other) (= dir :rev)) :reit-rev)))
+      (and (= dict :dict-cc) (= direction :fwd)) :dict-cc-fwd
+      (and (= dict :dict-cc) (= direction :rev)) :dict-cc-rev
+      (and (= dict :other) (= direction :fwd)) :reit-fwd
+      (and (= dict :other) (= direction :rev)) :reit-rev)))
+
+(defn- word-to-lookup
+  "based on direction and flipped, decide which word to look up"
+  [src target direction flipped]
+  (if (= direction :fwd)
+    (if flipped target src)
+    (if flipped src target)))
 
 (defn lkup-button
   "lookup button displayed below word and definition
    depends on the language specified; main and alternate lookups"
-  [words lang dict dir]
-  (let [url-key (lkup-url-key lang dict dir)
+  [src target lang dict direction flipped]
+  #_(print "lb" src target lang dict direction flipped)
+  (let [url-key (lkup-url-key lang dict direction)
         url (get lkup-urls url-key)
-        label (get labels url-key)]
+        label (get labels url-key)
+        word (word-to-lookup src target direction flipped)]
+    #_(print "args" url-key url label)
     [:button.button.is-rounded.has-background-light.ml-2.is-small
      {:key label  ;; needed to stop react from squawking
       :on-click #(.open js/window
-                        (str url words)
+                        (str url word)
                         "_blank")}
      label]))

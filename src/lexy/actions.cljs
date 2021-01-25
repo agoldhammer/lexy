@@ -7,7 +7,7 @@
   (let [score-cursor (dbs/current-score)
         {:keys [sid uid wid lrndsrc lrndtgt nseen] :as score} @score-cursor]
     (dbs/set-def-showing! false)
-    (swap! dbs/def-panel-state assoc :dir (rand-int 2))
+    (swap! dbs/def-panel-state assoc :flipped (dbs/coin-flip))
     ;; modify score as appropriate
     (print "score before modification" score)
     (let [newscore (merge score {:nseen (inc nseen)})]
