@@ -31,6 +31,11 @@
   [t-or-f]
   (swap! app-state assoc :login-showing? t-or-f))
 
+(defn is-flipped?
+  "report state of flipped flag"
+  []
+  (:flipped @def-panel-state))
+
 (defn reset-def-panel! 
   "reset definition panel to default state"
   []

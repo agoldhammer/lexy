@@ -18,7 +18,10 @@
    :response-format :json
    :keywords? true})
 
-(defn- debug-handler [response]
+
+(defn- debug-handler
+  "just log the response"
+  [response]
   (print "Debug handler: " response)
   #_(.log js/console response))
 
@@ -51,6 +54,11 @@
   [response]
   #_(print (str "fsh: " response))
   (reset! (dbs/current-score) response))
+
+(defn update-score
+  "send the updated score to the backend server"
+  [new-score]
+  (print "update-score" new-score))
 
 (defn get-endpoint
   "get endpoint from vocab server"
