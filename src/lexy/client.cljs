@@ -55,16 +55,6 @@
   #_(print (str "fsh: " response))
   (reset! (dbs/current-score) response))
 
-(defn update-score
-  "send the updated score to the backend server"
-  [new-score]
-  (print "update-score" new-score))
-
-(defn update-slug
-  "send the updated slug to the backend server"
-  [new-slug]
-  (print "update-slug" new-slug))
-
 (defn get-endpoint
   "get endpoint from vocab server"
   [endpoint handler]
@@ -78,6 +68,18 @@
     (merge (default-request-map) {:handler handler
                                   :format :json
                                   :params params})))
+
+(defn update-score
+  "send the updated score to the backend server"
+  [new-score]
+  (print "update-score" new-score)
+  (post-endpoint "/updatescore", new-score debug-handler))
+
+(defn update-slug
+  "send the updated slug to the backend server"
+  [new-slug]
+  (print "update-slug" new-slug)
+  (post-endpoint "/updateslug" new-slug debug-handler))
 
 (defn fetch-batch
   "get next batch of slugs"
