@@ -18,7 +18,7 @@
 (defn word-box
   "element for displaying word def, and supplement"
   [id myword]
-  #_(print "word-box called with" id myword)
+  (print "word-box called with" id myword)
   [:div.control.my-3.ml-4.mr-6
    [:input.input.is-medium.is-primary.mx-2.is-size-4
     {:id id
@@ -99,7 +99,7 @@
            (when def-showing?
              [:<>
               [word-box targetid target] ;; this is the definition
-              [word-box "supp" (:supp supp)]]) ;; this is the supplement
+              [word-box "supp" supp]]) ;; this is the supplement
              ;; showdef/prevword or right/wrong depending on state
            [button-array def-showing?]
            (when def-showing?
