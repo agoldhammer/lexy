@@ -95,6 +95,12 @@
   (swap! def-panel-state assoc :slug-changed? true-or-false)
   )
 
+(defn get-current-slug
+  "return the slug pointed to by the cursor"
+  []
+  (let [cursor (:cursor @def-panel-state)]
+       (nth (:slugs @def-panel-state) cursor)))
+
 (defn modify-current-slug
   [id new-value]
   (let [key (keyword id)

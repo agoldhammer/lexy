@@ -116,8 +116,8 @@
   (. js/document -location)
   #_(make-filemenu-body (:files @app-state))
   @dbs/def-panel-state
-  (:defs-loading? @def-panel-state)
-  (:def-showing? @def-panel-state)
+  (:defs-loading? @dbs/def-panel-state)
+  (:def-showing? @dbs/def-panel-state)
   (master-view)
   (render-view (def-view))
   (.open js/window "https://www.dict.cc/?s=schalten", "_blank")

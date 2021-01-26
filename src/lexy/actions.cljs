@@ -9,9 +9,8 @@
   (swap! dbs/def-panel-state assoc :flipped (dbs/coin-flip))
     ;; modify score as appropriate
 
-  (if (dbs/has-slug-changed?)
-    (print "slug has changed")
-    (print "slug has not changed"))
+  (when (dbs/has-slug-changed?)
+    (client/update-slug (dbs/get-current-slug)))
 
   (dbs/set-slug-changed false) ;; reset the slug changed flag
   (swap! dbs/def-panel-state update-in [:cursor] inc))

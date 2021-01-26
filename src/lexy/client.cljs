@@ -60,6 +60,11 @@
   [new-score]
   (print "update-score" new-score))
 
+(defn update-slug
+  "send the updated slug to the backend server"
+  [new-slug]
+  (print "update-slug" new-slug))
+
 (defn get-endpoint
   "get endpoint from vocab server"
   [endpoint handler]
