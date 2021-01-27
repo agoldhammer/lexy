@@ -60,6 +60,8 @@
   "set cursor back 1"
   []
   (let [cur (:cursor @def-panel-state)]
+    ;; reset current score to trigger new fetch
+    (swap! def-panel-state assoc-in [:current-score] nil)
     (swap! def-panel-state assoc-in [:cursor] (max 0 (dec cur)))))
 
 (defn set-def-showing!

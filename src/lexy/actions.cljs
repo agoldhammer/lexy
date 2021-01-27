@@ -17,20 +17,21 @@
 
 (defn- modify-score
   "inc nseen, modify lrnd flag as needed; call w true if right, false if wrong"
-  [right-or-wrong]
+  [right?]
   (let [score-cursor (dbs/current-score)
         {:keys [nseen] :as score} @score-cursor
         flipped? (dbs/is-flipped?)]
-    (print "score before modification" score)
+    #_(print "score before modification" score "right?" right?
+           "flipped?" flipped?)
     (let [temp-score (merge score {:nseen (inc nseen)})
           new-score (if flipped?
-                      (if right-or-wrong
+                      (if right?
                         (merge temp-score {:lrndtgt 1})
                         (merge temp-score {:lrndtgt 0}))
-                      (if right-or-wrong
+                      (if right?
                         (merge temp-score {:lrndsrc 1})
                         (merge temp-score {:lrndsrc 0})))]
-      (print "score after modification" new-score)
+      #_(print "score after modification" new-score)
       (client/update-score new-score))
     (reset! score-cursor nil) ;; reset score to trigger next fetch
     (bump-cursor)))

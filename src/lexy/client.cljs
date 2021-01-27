@@ -72,13 +72,13 @@
 (defn update-score
   "send the updated score to the backend server"
   [new-score]
-  (print "update-score" new-score)
+  #_(print "update-score" new-score)
   (post-endpoint "/updatescore", new-score debug-handler))
 
 (defn update-slug
   "send the updated slug to the backend server"
   [new-slug]
-  (print "update-slug" new-slug)
+  #_(print "update-slug" new-slug)
   (post-endpoint "/updateslug" new-slug debug-handler))
 
 (defn fetch-batch
