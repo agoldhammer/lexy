@@ -6,10 +6,8 @@
   "panel displaying info about current active settings;
    shown above definitions in main view"
   []
-  (let [{:keys [lang
-                batch-size
-                total]} @dbs/app-state]
+  (let [{:keys [batch-size total active-db]} @dbs/app-state]
     [:div-level.is-size-7.is-italic.has-text-info
-     (tagged-text "Database in use" lang)
+     (tagged-text "Database in use" active-db)
      (tagged-text "Batch size" batch-size)
      (tagged-text "Total" total)]))

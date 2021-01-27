@@ -6,7 +6,7 @@
   []
   (= 0 (rand-int 2)))
 
-(defonce default-app-state  {:lang nil
+(defonce default-app-state  {:active-db nil
                              :total 0
                              :batch-size 50
                              :logged-in? false

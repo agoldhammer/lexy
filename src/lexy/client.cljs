@@ -32,7 +32,7 @@
 (defn- slug-handler
   "set slugs in def-panel-state"
   [response]
-  #_(when DEBUG (print "slug-handler: resp: " response))
+  (print "slug-handler: resp: " (dissoc  response :slugs))
   (let [slugs (mapv #(apply ->Slug %) (:slugs response))
         response1 (merge response {:slugs slugs})
         new-state (merge response1 {:cursor 0
@@ -43,10 +43,11 @@
       (print "loading: " (:defs-loading? new-state)))
     ;; clear out any slugs remaining from previous log
     #_(print "slughandler: before: " (take 2 (:slugs def-panel-state)))
-    (swap! dbs/def-panel-state assoc :slugs [])
-    (when DEBUG
+    #_(swap! dbs/def-panel-state assoc :slugs [])
+    #_(when DEBUG
       (print "d-p-s slugs: shd be empty: " (take 2 (:slugs dbs/def-panel-state)))
       (print "new state" (take 2 (:slugs new-state))))
+    #_(print "slug-handler new state" (dissoc new-state :slugs))
     (swap! dbs/def-panel-state merge new-state)))
 
 (defn- fetch-score-handler
@@ -112,10 +113,13 @@
         (swap! dbs/app-state assoc :logged-in? false)
         (dbs/set-message-flag-and-text true "Bad Login"))
     (do
-      (swap! dbs/app-state merge {:logged-in? true
-                                  :total (:total response)})
+      (print "login handler: login branch" response)
+      ;; #_(swap! dbs/app-state merge {:logged-in? true
+      ;;                             :lang 
+      ;;                             :total (:total response)})
+      (swap! dbs/app-state merge (merge response {:logged-in? true}))
       (dbs/set-def-showing! false)
-      (print "good login")))
+      (print "good login app-state" @dbs/app-state)))
   (dbs/close-login-box!)
   (view-fn (:active-db response)))
 
