@@ -77,7 +77,7 @@
 ;; TODO test this and fix
 (defn fetch-more-button []
   [:button.button.is-rounded.is-success.ml-4
-   {:on-click #(client/fetch-batch)}
+   {:on-click client/fetch-batch}
    "Done, fetch more"])
 
 ;; TODO: add logout endpoint

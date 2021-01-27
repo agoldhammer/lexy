@@ -80,7 +80,7 @@
                                    ((juxt :wid :src :target :supp) slug)
                                    ((juxt :wid :target :src :supp) slug))
         logged-in? [:logged-in? @dbs/app-state]
-        lang (:lang @dbs/app-state)]
+        lang (:active-db @dbs/app-state)]
     (when DEBUG
       (print "def-panel: " defs-loading? slug cursor
              (first slugs)))

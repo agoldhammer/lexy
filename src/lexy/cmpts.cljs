@@ -19,8 +19,9 @@
    for lkup buttons"
   [lang dict direction]
   #_(print "lkup-url-key" lang dict flipped)
-  (if (or (= lang "german") (= lang "redux2")
-          (= lang "newgerman"))
+  ;; TODO fix this for different language choices; lang is set by active-db in
+  ;;   dbs/app-state
+  (if (not= lang "italian")
     (cond
       (and (= dict :other) (= direction :fwd)) :glosbe-fwd
       (and (= dict :other) (= direction :rev)) :glosbe-rev
