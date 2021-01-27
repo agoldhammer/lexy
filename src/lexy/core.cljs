@@ -20,8 +20,8 @@
 
 (defn set-master-view
   "set active db in app-state and initiate the master view, showing word def"
-  [lang-or-nil]
-  (client/fetch-batch lang-or-nil)
+  []
+  (client/fetch-batch)
   (master-view))
 
 (defn submit-login
