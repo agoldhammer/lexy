@@ -2,8 +2,8 @@
   (:require [lexy.dbs :as dbs]
             [lexy.actions :as ax]
             [lexy.client :as client]
-            [lexy.utils :refer [tagged-text]]
-            [lexy.cmpts :refer [lkup-button]]))
+            [lexy.cmpts :refer [lkup-button]]
+            [lexy.utils :as utils]))
 
 (def DEBUG false)
 
@@ -36,15 +36,18 @@
 (defn score-panel
   "display score"
   [wid]
-  (let [{:keys [sid lrndsrc
+  (let [{:keys [#_sid lrndsrc
                 lrndtgt nseen]} @(dbs/current-score)]
     #_(print "score-panel:" lrndsrc lrndtgt nseen score)
     [:div-level.is-size-8.is-italic.has-text-info
-     (tagged-text "wid" wid)
-     (tagged-text "sid" sid)
-     (tagged-text "Learned fwd" lrndsrc)
-     (tagged-text "Learned bwd" lrndtgt)
-     (tagged-text "Times seen" nseen)]))
+     [utils/tagged-text "wid" wid]
+     #_[utils/tagged-text "sid" sid]
+     [utils/tagged-text "Forn->Eng" lrndsrc]
+     [utils/red-green-led lrndsrc]
+     [utils/tagged-text "Eng->Forn" lrndtgt]
+     [utils/red-green-led lrndtgt]
+     [utils/tagged-text "Times seen" nseen]
+     [utils/traffic-light nseen]]))
 
 (defn button-array [def-showing?]
   [:div.field.is-grouped
