@@ -6,6 +6,10 @@ package-lock.json
 yarn.lock
 /.lsp
 .clj-kondo/*
+/public/*.png
+/public/*.zip
+/public/*.ico
+/public/site.webmanifest
 
 
 
