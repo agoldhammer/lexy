@@ -1,5 +1,5 @@
 (ns lexy.client
-  (:require [ajax.core :as ajax :refer [GET POST]]
+  (:require [ajax.core :as ajax]
             [lexy.dbs :as dbs]))
 
 (declare debug-handler)
@@ -32,7 +32,7 @@
 (defn- slug-handler
   "set slugs in def-panel-state"
   [response]
-  (print "slug-handler: resp: " (dissoc  response :slugs))
+  #_(print "slug-handler: resp: " (dissoc  response :slugs))
   (let [slugs (mapv #(apply ->Slug %) (:slugs response))
         response1 (merge response {:slugs slugs})
         new-state (merge response1 {:cursor 0
@@ -54,13 +54,13 @@
 (defn get-endpoint
   "get endpoint from vocab server"
   [endpoint handler]
-  (GET endpoint
+  (ajax/GET endpoint
     (merge (default-request-map) {:handler handler})))
 
 (defn post-endpoint
   "post endpoint from vocab server"
   [endpoint params handler]
-  (POST endpoint
+  (ajax/POST endpoint
     (merge (default-request-map) {:handler handler
                                   :format :json
                                   :params params})))
@@ -80,7 +80,7 @@
 (defn fetch-batch
   "get next batch of slugs"
   []
-  (print "fetch-batch called")
+  #_(print "fetch-batch called")
   (dbs/set-defs-loading true)
   (get-endpoint (str "/fetch") slug-handler))
 
@@ -101,7 +101,7 @@
    view fn will be set-master-view from core
    call as (partial login-handler set-master-view)"
   [view-fn response]
-  (print "login-handler: " response)
+  #_(print "login-handler: " response)
   (if (= (:login response) "rejected")
     (do (print "bad login")
         (dbs/set-language! nil)

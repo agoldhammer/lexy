@@ -72,8 +72,8 @@
 
 (defn master-view
   []
-  (print "master view called")
-  (print "app state" @dbs/app-state)
+  #_(print "master view called")
+  #_(print "app state" @dbs/app-state)
   (let [{:keys [message-showing? logged-in?]} @dbs/app-state]
     
     (if message-showing?
