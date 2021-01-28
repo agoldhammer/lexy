@@ -74,7 +74,6 @@
    {:on-click wrong-action}
    "Wrong"])
 
-;; TODO test this and fix
 (defn fetch-more-button []
   [:button.button.is-rounded.is-success.ml-4
    {:on-click client/fetch-batch}

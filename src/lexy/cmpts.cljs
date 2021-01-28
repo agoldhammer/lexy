@@ -1,4 +1,5 @@
-(ns lexy.cmpts)
+(ns lexy.cmpts
+  (:require [clojure.str :as str]))
 
 (def lkup-urls {:glosbe-fwd "https://glosbe.com/de/en/"
                 :glosbe-rev "https://glosbe.com/en/de/"
@@ -21,7 +22,7 @@
   #_(print "lkup-url-key" lang dict flipped)
   ;; TODO fix this for different language choices; lang is set by active-db in
   ;;   dbs/app-state
-  (if (not= lang "italian")
+  (if (not (str/starts-with?  lang "italian"))
     (cond
       (and (= dict :other) (= direction :fwd)) :glosbe-fwd
       (and (= dict :other) (= direction :rev)) :glosbe-rev

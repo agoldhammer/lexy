@@ -1,13 +1,12 @@
 (ns lexy.defpanel
-  (:require [lexy.dbs :as dbs]
-            [lexy.actions :as ax]
+  (:require [lexy.actions :as ax]
             [lexy.client :as client]
             [lexy.cmpts :refer [lkup-button]]
+            [lexy.dbs :as dbs]
             [lexy.utils :as utils]))
 
 (def DEBUG false)
 
-;; TODO fixthis
 (defn- modify-slug
   "called by word-box when any part of slug is changed"
   [id event]
