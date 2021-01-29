@@ -121,7 +121,6 @@
 ;; to silence spurious warning from clojure-lsp
 (comment
   (fetch-score 1877)
-  (print (dissoc :slugs  dbs/def-panel-state))
   (Slug []))
 
 
