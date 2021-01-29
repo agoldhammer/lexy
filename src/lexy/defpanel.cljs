@@ -63,7 +63,7 @@
   [:div.field.is-grouped  ;; else def-showing? is false
                   ;; when lang is "italian", :other = :reit
                   ;; when lang is "german", :other = :glosbe
-   (when (not= lang "italian")
+   (when (not (.startsWith lang "italian"))
      (list
       (lkup-button src target lang :dict-cc :fwd flipped)
       (lkup-button src target lang :dict-cc :rev flipped)))
