@@ -36,16 +36,17 @@
   "display score"
   [wid]
   (let [{:keys [#_sid lrndsrc
-                lrndtgt nseen]} @(dbs/current-score)]
+                lrndtgt nseen]} @(dbs/current-score)
+        _ wid]
     #_(print "score-panel:" lrndsrc lrndtgt nseen score)
-    [:div-level.is-size-8.is-italic.has-text-info
-     [utils/tagged-text "wid" wid]
+    [:div-level.is-size-6.is-italic.has-text-info
+     #_[utils/tagged-text "wid" wid]
      #_[utils/tagged-text "sid" sid]
-     [utils/tagged-text "Forn->Eng" lrndsrc]
+     [utils/tagged-text "For->Eng" lrndsrc]
      [utils/red-green-led lrndsrc]
-     [utils/tagged-text "Eng->Forn" lrndtgt]
+     [utils/tagged-text "Eng->For" lrndtgt]
      [utils/red-green-led lrndtgt]
-     [utils/tagged-text "Times seen" nseen]
+     [utils/tagged-text "# seen" nseen]
      [utils/traffic-light nseen]]))
 
 (defn button-array [def-showing?]

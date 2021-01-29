@@ -36,13 +36,13 @@
 (defn menu
   "fixed menu view"
   []
-  [:nav.navbar.is-primary
+  [:nav.navbar.is-primary.is-full
    {:role "navigation" :aria-label "main navigation"}
    [:div.navbar-brand
-    [:div.level
-     [:i.fas.fa-bookmark.ml-2.mt-5]
-     [:a.navbar-item.mt-5.has-text-danger.is-size-4.is-italic
-      {:href "#"} "lexy"]]
+    [:a.navbar-item.is-size-4
+     [:i.fas.fa-bookmark.ml-2]]
+    [:a.navbar-item.has-text-danger.is-size-4.is-italic
+     {:href "#"} "lexy"]
     [:a.navbar-burger.burger {:role "button"
                               :aria-label "menu"
                               :aria-expanded "false"}
