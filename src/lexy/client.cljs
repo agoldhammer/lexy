@@ -69,7 +69,7 @@
   "send the updated score to the backend server"
   [new-score]
   #_(print "update-score" new-score)
-  (post-endpoint "/updatescore", new-score debug-handler))
+  (post-endpoint "/updatescore" new-score debug-handler))
 
 (defn update-slug
   "send the updated slug to the backend server"
@@ -120,7 +120,7 @@
 
 ;; to silence spurious warning from clojure-lsp
 (comment
-  (fetch-score 1877)
+  (fetch-score 357)
   (Slug []))
 
 
