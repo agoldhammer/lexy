@@ -39,10 +39,6 @@
                                     :defs-loading? false
                                     :def-showing? false})]
     
-    ;; clear out any slugs remaining from previous log
-    #_(print "slughandler: before: " (take 2 (:slugs def-panel-state)))
-    #_(swap! dbs/def-panel-state assoc :slugs [])
-    #_(print "slug-handler new state" (dissoc new-state :slugs))
     (swap! dbs/def-panel-state merge new-state)))
 
 (defn- fetch-score-handler
