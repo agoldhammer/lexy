@@ -54,12 +54,14 @@
 (defn get-endpoint
   "get endpoint from vocab server"
   [endpoint handler]
+  #_{:clj-kondo/ignore [:unresolved-var]}
   (ajax/GET endpoint
     (merge (default-request-map) {:handler handler})))
 
 (defn post-endpoint
   "post endpoint from vocab server"
   [endpoint params handler]
+  #_{:clj-kondo/ignore [:unresolved-var]}
   (ajax/POST endpoint
     (merge (default-request-map) {:handler handler
                                   :format :json
