@@ -38,6 +38,7 @@
   (let [adding-vocab? (:addvocab-showing?  @dbs/app-state)
         text (if adding-vocab? "Practice" "Add Vocab")]
     [:button.navbar-item.button.is-ghost.is-small.mt-3.ml-6.has-text-danger
+     {:on-click #(swap! dbs/app-state update-in [:addvocab-showing?] not)}
      text])
   )
 
