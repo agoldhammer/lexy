@@ -32,6 +32,13 @@
                    :password pw}
                   (partial client/login-handler set-master-view))))
 
+(defn mode-button
+  "switch between practice and addvocab modes"
+  []
+  [:button.navbar-item.button.is-ghost.is-small.mt-3.ml-6.has-text-danger
+   "Add Vocab"]
+  )
+
 
 (defn menu
   "fixed menu view"
@@ -43,6 +50,7 @@
      [:i.fas.fa-bookmark.ml-2]]
     [:a.navbar-item.has-text-danger.is-size-4.is-italic
      {:href "#"} "lexy"]
+    [mode-button]
     [:a.navbar-burger.burger {:role "button"
                               :aria-label "menu"
                               :aria-expanded "false"}
