@@ -12,6 +12,7 @@
                              :logged-in? false
                              :message-showing? false
                              :message-text ""
+                             :addvocab-showing? false
                              :login-showing? true})
 
 (defonce default-panel-state {:slugs []
@@ -22,9 +23,9 @@
                               :defs-loading? true
                               :def-showing? false})
 
-(def def-panel-state (reagent/atom default-panel-state))
+(defonce def-panel-state (reagent/atom default-panel-state))
 
-(def app-state (reagent/atom default-app-state))
+(defonce app-state (reagent/atom default-app-state))
 
 (defn set-login-showing 
   "set/reset login-showing? flag"
@@ -128,4 +129,5 @@
   (print (dissoc @def-panel-state :slugs))
   (print @app-state)
   (print (coin-flip))
-  (has-slug-changed?))
+  (has-slug-changed?)
+  (swap! app-state update-in [:addvocab-showing?] not))

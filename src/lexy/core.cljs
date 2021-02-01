@@ -35,8 +35,10 @@
 (defn mode-button
   "switch between practice and addvocab modes"
   []
-  [:button.navbar-item.button.is-ghost.is-small.mt-3.ml-6.has-text-danger
-   "Add Vocab"]
+  (let [adding-vocab? (:addvocab-showing?  @dbs/app-state)
+        text (if adding-vocab? "Practice" "Add Vocab")]
+    [:button.navbar-item.button.is-ghost.is-small.mt-3.ml-6.has-text-danger
+     text])
   )
 
 
@@ -60,12 +62,17 @@
    ])
 
 (defn def-view
-  "view with defs and associatedbuttons"
+  "view with defs and associatedbuttons
+   or: addvocab view"
   []
-  [:div#top
-   [menu]
-   [info/info-panel]
-   [def-panel]])
+  (let [adding-vocab? (:addvocab-showing? @dbs/app-state)]
+    [:div#top
+     [menu]
+     [info/info-panel]
+     (print adding-vocab?)
+     (if (not  adding-vocab?)
+       [def-panel]
+       [:p "change this to addvocab panel"])]))
 
 (defn message-view
   "display modal message box"
@@ -85,10 +92,10 @@
   (let [{:keys [message-showing? logged-in?]} @dbs/app-state]
     
     (if message-showing?
-      (render-view (message-view))
+      (render-view [message-view])
       (if (not logged-in?)
-        (render-view (login/login-box submit-login))
-        (render-view (def-view))))))
+        (render-view [login/login-box submit-login])
+        (render-view [def-view])))))
 
 (defn start
   "render the initial view"
