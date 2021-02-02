@@ -3,6 +3,7 @@
             [lexy.client :as client]
             [lexy.defpanel :refer [def-panel]]
             [lexy.dbs :as dbs]
+            [lexy.input :as input]
             [lexy.infopanel :as info]
             [lexy.login :as login]
             [lexy.message :refer [message-box]]
@@ -73,7 +74,7 @@
      (print adding-vocab?)
      (if (not  adding-vocab?)
        [def-panel]
-       [:p "change this to addvocab panel"])]))
+       [input/edit-panel])]))
 
 (defn message-view
   "display modal message box"
