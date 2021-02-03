@@ -75,12 +75,19 @@
   #_(print "update-slug" new-slug)
   (post-endpoint "/updateslug" new-slug debug-handler))
 
+(defn- add-slug-handler
+  "handle response from adding new slug"
+  [response]
+  (when (= "ok" (:addnewslug response))
+    (swap! dbs/app-state assoc :total (:count response))))
+
 (defn submit-new-slug
   "from input panel, submit new slug"
   [parts]
   ;; into coerces Slug into map
   (let [slug-as-map (into {} (apply ->Slug nil parts))]
-    (print slug-as-map)))
+    (print slug-as-map)
+    (post-endpoint "/addnewslug" slug-as-map add-slug-handler)))
 
 (defn fetch-batch
   "get next batch of slugs"
