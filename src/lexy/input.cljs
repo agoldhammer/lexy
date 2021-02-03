@@ -1,5 +1,6 @@
 (ns lexy.input
-  (:require [lexy.client :as client]))
+  (:require [lexy.client :as client]
+            [reagent.core :as reagent]))
 
 (defn- clear-btn-with-id
   "clear text from button with given id"
@@ -14,7 +15,6 @@
   [id enable?]
   (print "enable-btn-with-id called" id enable?)
   (let [elt (. js/document getElementById id)]
-    #_(set! (. elt -disabled) (not t-or-f))
     (if (not enable?)
       (.setAttribute elt "disabled" true)
       (.removeAttribute elt "disabled"))))
@@ -66,12 +66,15 @@
 
 (defn- submit-button
   "submit the new slug"
-  []
-  [:button#edsubmit.button.is-rounded.is-success.ml-4
-   {:on-click #(collect-values-and-submit %)
+  [enabled?]
+  (let [is-enabled? (reagent/atom enabled?)]
+    (fn [enabled?]
+      (reset! is-enabled? enabled?)
+      [:button#edsubmit.button.is-rounded.is-success.ml-4
+       {:on-click #(collect-values-and-submit %)
     ;; TODO: this should start disabled, enable only when condx satisfied
-    :disabled true}
-   "Submit"])
+        :disabled @is-enabled?}
+       "Submit"])))
 
 (defn- edit-box-change
   "called when any edit box changes"
@@ -103,7 +106,7 @@
    [edit-box "edtgt"]
    [edit-box "edsupp"]
    [:div
-    [submit-button] [clear-button]]])
+    [submit-button false] [clear-button]]])
 
 (comment
   (clear-btn-with-id "edsrc")
