@@ -75,6 +75,12 @@
   #_(print "update-slug" new-slug)
   (post-endpoint "/updateslug" new-slug debug-handler))
 
+(defn submit-new-slug
+  "from input panel, submit new slug"
+  [parts]
+  ;; into coerces Slug into map
+  (print (into {} (apply ->Slug nil parts))))
+
 (defn fetch-batch
   "get next batch of slugs"
   []
@@ -119,6 +125,6 @@
 ;; to silence spurious warning from clojure-lsp
 (comment
   (fetch-score 357)
-  (Slug []))
+  (print  (->Slug nil 1 2 3)))
 
 

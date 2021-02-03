@@ -1,4 +1,5 @@
-(ns lexy.input)
+(ns lexy.input
+  (:require [lexy.client :as client]))
 
 (defn- clear-btn-with-id
   "clear text from button with given id"
@@ -31,16 +32,18 @@
   []
   (let [vals
         (mapv get-val-of-btn-with-id ["edsrc" "edtgt" "edsupp"])]
-    (print vals)
+    #_(print vals)
     ;; TODO write submit function!!!
-    #_submitnewslug
+    (client/submit-new-slug vals)
     (clear-all-inputs)))
 
 (defn- submit-button
   "submit the new slug"
   []
   [:button.button.is-rounded.is-success.ml-4
-   {:on-click collect-values}
+   {:on-click collect-values
+    ;; TODO: this should start disabled, enable only when condx satisfied
+    :disabled false}
    "Submit"])
 
 (defn- edit-box
