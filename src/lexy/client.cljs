@@ -79,7 +79,8 @@
   "from input panel, submit new slug"
   [parts]
   ;; into coerces Slug into map
-  (print (into {} (apply ->Slug nil parts))))
+  (let [slug-as-map (into {} (apply ->Slug nil parts))]
+    (print slug-as-map)))
 
 (defn fetch-batch
   "get next batch of slugs"
