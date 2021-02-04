@@ -1,4 +1,6 @@
-(ns lexy.utils)
+(ns lexy.utils
+  #_{:clj-kondo/ignore [:unused-namespace]}
+  (:require [lexy.test :as test]))
 
 (defn id->value
   "get value of element with specified id"
@@ -32,6 +34,8 @@
     :else [:span.icon.ml-2.has-text-warning
            [:img.fas.fa-circle]]))
 
+
 (comment
   (traffic-light 11)
-  (red-green-led 1))
+  (red-green-led 1)
+  (test/runts))
