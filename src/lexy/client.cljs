@@ -26,8 +26,10 @@
   #_(.log js/console response))
 
 (defn- error-handler [{:keys [status status-text]}]
-  (print "lexy ajax error:" status status-text)
-  #_(.log js/console (str "AJAX error" status " " status-text)))
+  (let [msg (str "lexy error: " status " " status-text)]
+       (print msg)
+       (swap! dbs/app-state merge {:message-showing? true
+                                   :message-text msg})))
 
 (defn- slug-handler
   "set slugs in def-panel-state"
@@ -133,6 +135,8 @@
 ;; to silence spurious warning from clojure-lsp
 (comment
   (fetch-score 357)
-  (print  (->Slug nil 1 2 3)))
+  (print  (->Slug nil 1 2 3))
+  (print  @dbs/app-state)
+  (error-handler {:status 404 :status-text "not found"}))
 
 
