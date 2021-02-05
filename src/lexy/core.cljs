@@ -63,24 +63,26 @@
      [:span {:aria-hidden "true"}]]]
    ])
 
-(defn def-view
-  "view with defs and associatedbuttons
-   or: addvocab view"
-  []
-  (let [adding-vocab? (:addvocab-showing? @dbs/app-state)]
-    [:div#top
-     [menu]
-     [info/info-panel]
-     (print adding-vocab?)
-     (if (not  adding-vocab?)
-       [def-panel]
-       [input/edit-panel])]))
-
 (defn message-view
   "display modal message box"
   []
   (let [text (:message-text @dbs/app-state)]
     (message-box text true #(msg-dismiss-action master-view))))
+
+(defn def-view
+  "view with defs and associatedbuttons
+   or: addvocab view"
+  []
+  (let [{:keys [addvocab-showing? message-showing?]} @dbs/app-state]
+    (if message-showing?
+      [message-view]
+      [:div#top
+       [menu]
+       [info/info-panel]
+       #_(print addvocab-showing?)
+       (if (not  addvocab-showing?)
+         [def-panel]
+         [input/edit-panel])])))
 
 (defn render-view
   "render a defined view"
