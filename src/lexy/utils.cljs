@@ -1,6 +1,4 @@
-(ns lexy.utils
-  #_{:clj-kondo/ignore [:unused-namespace]}
-  (:require [lexy.test :as test]))
+(ns lexy.utils)
 
 (defn id->value
   "get value of element with specified id"
@@ -37,5 +35,4 @@
 
 (comment
   (traffic-light 11)
-  (red-green-led 1)
-  (test/runts))
+  (red-green-led 1))
