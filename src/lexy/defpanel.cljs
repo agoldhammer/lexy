@@ -60,7 +60,7 @@
                  (ax/wrong-button)])])
 
 (defn lkup-array [lang src target flipped]
-  [:div.field.is-grouped  ;; else def-showing? is false
+  [:div.field.is-grouped.is-full  ;; else def-showing? is false
                   ;; when lang is "italian", :other = :reit
                   ;; when lang is "german", :other = :glosbe
    (when (not (.startsWith lang "italian"))
@@ -96,7 +96,7 @@
       ;; else not loading
       (if logged-in?
         (if slug
-          [:div.field.ml-2.mr-10
+          [:div.is-full.ml-2
            [score-panel wid]
            [word-box srcid src] ;; this is the word to be defined
            ;; even if supp is blank, show box, so can be edited

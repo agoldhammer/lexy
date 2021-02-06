@@ -76,7 +76,7 @@
   (let [{:keys [addvocab-showing? message-showing?]} @dbs/app-state]
     (if message-showing?
       [message-view]
-      [:div#top
+      [:div#top.is-full
        [menu]
        [info/info-panel]
        #_(print addvocab-showing?)
