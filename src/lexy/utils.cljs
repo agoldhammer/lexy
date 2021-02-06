@@ -37,5 +37,4 @@
 
 (comment
   (traffic-light 11)
-  (red-green-led 1)
-  (test/runts))
+  (red-green-led 1))
