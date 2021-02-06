@@ -64,11 +64,12 @@
                   ;; when lang is "italian", :other = :reit
                   ;; when lang is "german", :other = :glosbe
    (when (not (.startsWith lang "italian"))
-     (list
-      (lkup-button src target lang :dict-cc :fwd flipped)
-      (lkup-button src target lang :dict-cc :rev flipped)))
-   (lkup-button src target lang :other :fwd flipped)
-   (lkup-button src target lang :other :rev flipped)])
+     [:div.control
+      [lkup-button src target lang :dict-cc :fwd flipped]
+      [lkup-button src target lang :dict-cc :rev flipped]])
+   [:div.control
+    [lkup-button src target lang :other :fwd flipped]
+    [lkup-button src target lang :other :rev flipped]]])
 
 (defn def-panel
   "view with word and defs"

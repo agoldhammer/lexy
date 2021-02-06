@@ -8,12 +8,12 @@
                 :reit-fwd "https://dictionary.reverso.net/italian-english/"
                 :reit-rev "https://dictionary.reverso.net/english-italian/"})
 
-(def labels {:glosbe-fwd "Glosbe De-En"
-             :glosbe-rev "Glosbe En-De"
-             :dict-cc-fwd "DictCC De-Eng"
+(def labels {:glosbe-fwd "Glosbe De->Eng"
+             :glosbe-rev "Glosbe Eng->De"
+             :dict-cc-fwd "DictCC De->Eng"
              :dict-cc-rev "DictCC Eng->De"
-             :reit-fwd "Ital-Eng"
-             :reit-rev "Eng-Ital"})
+             :reit-fwd "Ital->Eng"
+             :reit-rev "Eng->Ital"})
 
 (defn lkup-url-key
   "helper function to determine url key into above maps
@@ -52,7 +52,7 @@
         label (get labels url-key)
         word (word-to-lookup src target direction flipped)]
     #_(print "args" url-key url label)
-    [:button.button.is-rounded.has-background-light.ml-2.is-small
+    [:button.button.is-rounded.has-background-light.ml-2.is-size-7
      {:key label  ;; needed to stop react from squawking
       :on-click #(.open js/window
                         (str url word)

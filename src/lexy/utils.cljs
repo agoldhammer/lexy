@@ -32,7 +32,13 @@
     :else [:span.icon.ml-2.has-text-warning
            [:img.fas.fa-circle]]))
 
+(defn gen-key
+  "generate a unique key to satisy React"
+  []
+  (gensym "key-"))
+
 
 (comment
   (traffic-light 11)
-  (red-green-led 1))
+  (red-green-led 1)
+  (gen-key))
