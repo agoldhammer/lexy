@@ -60,16 +60,20 @@
                  (ax/wrong-button)])])
 
 (defn lkup-array [lang src target flipped]
-  [:div.field.is-grouped.is-full  ;; else def-showing? is false
+  [:div.field.is-grouped.is-full.mt-6  ;; else def-showing? is false
                   ;; when lang is "italian", :other = :reit
                   ;; when lang is "german", :other = :glosbe
    (when (not (.startsWith lang "italian"))
-     [:div.control
-      [lkup-button src target lang :dict-cc :fwd flipped]
-      [lkup-button src target lang :dict-cc :rev flipped]])
-   [:div.control
-    [lkup-button src target lang :other :fwd flipped]
-    [lkup-button src target lang :other :rev flipped]]])
+     [:div.field
+      [:label.label "DictCC"]
+      [:div.control
+       [lkup-button src target lang :dict-cc :fwd flipped]
+       [lkup-button src target lang :dict-cc :rev flipped]]])
+   [:div.field
+    [:label.label "Context"]
+    [:div.control
+     [lkup-button src target lang :other :fwd flipped]
+     [lkup-button src target lang :other :rev flipped]]]])
 
 (defn def-panel
   "view with word and defs"

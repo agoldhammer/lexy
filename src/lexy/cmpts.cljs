@@ -8,10 +8,10 @@
                 :reit-fwd "https://dictionary.reverso.net/italian-english/"
                 :reit-rev "https://dictionary.reverso.net/english-italian/"})
 
-(def labels {:glosbe-fwd "Glosbe De->Eng"
-             :glosbe-rev "Glosbe Eng->De"
-             :dict-cc-fwd "DictCC De->Eng"
-             :dict-cc-rev "DictCC Eng->De"
+(def labels {:glosbe-fwd "De->Eng"
+             :glosbe-rev "Eng->De"
+             :dict-cc-fwd "De->Eng"
+             :dict-cc-rev "Eng->De"
              :reit-fwd "Ital->Eng"
              :reit-rev "Eng->Ital"})
 
