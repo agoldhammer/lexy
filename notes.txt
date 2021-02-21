@@ -1,2 +1,7 @@
-top band is too high and on phone too wide
 menu needed for future expansion?
+
+TODO:
+allow repeating same batch
+lookup verb conjugations?
+give visible indication of successful vocab addition?
+
