@@ -53,7 +53,10 @@
   (let [vals (collect-values)]
     #_(print "collect vals and submit called" vals)
     (client/submit-new-slug vals)
-    (clear-all-inputs)))
+    (clear-all-inputs)
+    ;; focus the source box
+    (.focus (.getElementById js/document "edsrc"))
+    ))
 
 (defn- submit-button
   "submit the new slug"
@@ -78,14 +81,16 @@
   (let [ph (condp = id
              "edsrc" "New foreign word"
              "edtgt" "New English definition"
-             "edsupp" "New supplementary info")]
+             "edsupp" "New supplementary info")
+        props {:id id
+               :placeholder ph
+               :type "text"
+               :on-change edit-box-change}]
     [:div.control.my-3.ml-4.mr-6
      [:input.input.is-medium.is-primary.mx-2.is-size-4
-      {:id id
-       #_#_:value ""
-       :placeholder ph
-       :type "text"
-       :on-change edit-box-change}]]))
+      (if (= id "edsrc")
+        (merge props {:auto-focus true})
+        props)]]))
 
 (defn edit-panel
   "view function for edit-panel"
@@ -102,6 +107,6 @@
   (clear-btn-with-id "edsrc")
   (get-val-of-elt-with-id "edsrc")
   (ready-to-submit?)
-  (collect-values-and-submit nil)
+  (collect-values-and-submit)
   (. (. js/document getElementById "edsubmit") -onclick))
 
