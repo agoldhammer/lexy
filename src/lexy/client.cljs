@@ -13,7 +13,7 @@
   []
   {:handler debug-handler
    :error-handler error-handler
-   :timeout 1000
+   :timeout 5000
    :with-credentials true
    :response-format :json
    :keywords? true})
