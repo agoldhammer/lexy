@@ -30,7 +30,8 @@
   []
   (let [[un pw] (mapv utils/id->value ["un" "pw"])]
     (client/login {:username un
-                   :password pw}
+                   :password pw
+                   :bsize (:batch-size @dbs/app-state)}
                   (partial client/login-handler set-master-view))))
 
 (defn mode-button

@@ -4,6 +4,7 @@
 
 (defn batsize
   "radio button calling for batch of size value"
+  #_:clj-kondo/ignore
   [value]
   (let [selected (:batch-size @dbs/app-state)]
     (fn [value]
@@ -18,6 +19,7 @@
          (str value)])))
 
 
+;; Calls submit-fn to submit credentials and batch size to server
 (defn login-box
   "login element"
   [submit-fn]
