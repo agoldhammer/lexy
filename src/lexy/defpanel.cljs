@@ -116,6 +116,7 @@
              [lkup-array lang src target flipped])]
         ;; else if slug is nil
           [:div
+           (ax/repeat-current-batch-button)
            (ax/fetch-more-button)
            (ax/logout-button)])
 ;; not logged in

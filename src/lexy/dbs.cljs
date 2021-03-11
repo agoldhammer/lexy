@@ -133,4 +133,5 @@
   (has-slug-changed?)
   (swap! app-state update-in [:addvocab-showing?] not)
   (utils/is-checked "b25")
-  (utils/id->value "b50"))
+  (utils/id->value "b50")
+  (swap! def-panel-state assoc :cursor 24))

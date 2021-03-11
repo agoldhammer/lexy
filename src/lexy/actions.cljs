@@ -75,9 +75,21 @@
    "Wrong"])
 
 (defn fetch-more-button []
-  [:button.button.is-rounded.is-success.ml-4
+  [:button.button.is-rounded.is-warning.ml-4
    {:on-click client/fetch-batch}
    "Done, fetch more"])
+
+(defn shuffle-slugs
+  "reorder the current set of slugs"
+  []
+  (let [current-slugs (:slugs @dbs/def-panel-state)]
+    (swap! dbs/def-panel-state assoc :slugs (shuffle current-slugs))
+    (swap! dbs/def-panel-state assoc :cursor 0)))
+
+(defn repeat-current-batch-button []
+  [:button.button.is-rounded.is-success.ml-4
+   {:on-click #(shuffle-slugs)}
+   "Repeat"])
 
 ;; TODO: add logout endpoint
 (defn logout-button []
