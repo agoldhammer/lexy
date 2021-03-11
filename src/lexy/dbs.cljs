@@ -1,5 +1,6 @@
 (ns lexy.dbs
-  (:require [reagent.core :as reagent]))
+  (:require [lexy.utils :as utils]
+   [reagent.core :as reagent]))
 
 (defn coin-flip
   "flip coin, return true if heads, false if tails"
@@ -8,7 +9,7 @@
 
 (defonce default-app-state  {:active-db nil
                              :total 0
-                             :batch-size 50
+                             :batch-size 25
                              :logged-in? false
                              :message-showing? false
                              :message-text ""
@@ -130,4 +131,6 @@
   (print @app-state)
   (print (coin-flip))
   (has-slug-changed?)
-  (swap! app-state update-in [:addvocab-showing?] not))
+  (swap! app-state update-in [:addvocab-showing?] not)
+  (utils/is-checked "b25")
+  (utils/id->value "b50"))

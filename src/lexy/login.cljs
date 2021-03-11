@@ -2,6 +2,22 @@
   (:require [lexy.dbs :as dbs]))
 
 
+(defn batsize
+  "radio button calling for batch of size value"
+  [value]
+  (let [selected (:batch-size @dbs/app-state)]
+    (fn [value]
+        [:label.radio.ml-2
+         [:input {:id (str "bats" value)
+                  :type "radio"
+                  :name "batsize"
+                  :value value
+                  :defaultChecked (= value selected)
+                  :on-change #(swap! dbs/app-state assoc :batch-size value)}]
+
+         (str value)])))
+
+
 (defn login-box
   "login element"
   [submit-fn]
@@ -27,4 +43,6 @@
          [:button.button.is-success
           {:on-click submit-fn} "Login"]
          [:button.button
-          {:on-click dbs/close-login-box!} "Cancel"]]]])))
+          {:on-click dbs/close-login-box!} "Cancel"]
+         [:label.label.ml-4.mr-3 "Batch size:"]
+         [batsize 10] [batsize 25] [batsize 50]]]])))
